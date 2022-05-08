@@ -1,2 +1,2 @@
-# quant_service
+# Quant Service
 Service for quantitative finance
