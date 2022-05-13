@@ -33,32 +33,3 @@ steps:
     projects: '**/*Tests/*.csproj'
     arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./MyCoverage/'
     publishTestResults: true
-
-- task: PublishCodeCoverageResults@1
-  displayName: 'Publish Code Coverage Results'
-  inputs:
-    codeCoverageTool: 'Cobertura'
-    summaryFileLocation: '**/*Tests/MyCoverage/coverage.cobertura.xml'
-    failIfCoverageEmpty: true
-
-- task: DotNetCoreCLI@2
-  displayName: Publish
-  inputs:
-    command: 'publish'
-    publishWebProjects: true
-    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-    
-- task: PublishPipelineArtifact@1
-  displayName: Publish Artifacts
-  inputs:
-    targetPath: '$(Build.ArtifactStagingDirectory)'
-    publishLocation: 'pipeline'
-
-- task: Docker@2
-  displayName: Docker Build and Push
-  inputs:
-    containerRegistry: 'SevnaQuantRegistry'
-    repository: 'sevnaquantservice'
-    command: 'buildAndPush'
-    Dockerfile: '**/Dockerfile'
-    buildContext: '$(Build.ArtifactStagingDirectory)'
