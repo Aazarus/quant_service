@@ -2,9 +2,16 @@
 // Copyright (c) Sevna Software LTD. All rights reserved.
 // </copyright>
 
+using Microsoft.EntityFrameworkCore;
+using Service.Models;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<QuantDataContext>(options =>
+{
+    options.UseSqlServer(builder.Configuration["Data:Quant:ConnectionString"]);
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -22,7 +29,6 @@ builder.Services.AddCors(options =>
                 .AllowAnyHeader();
         });
 });
-
 
 var app = builder.Build();
 
