@@ -7,8 +7,8 @@ namespace Service.Models;
 public class Symbol
 {
     public int SymbolId { get; set; }
-    public string Ticker { get; set; }
-    public string Region { get; set; }
-    public string Sector { get; set; }
-    public virtual ICollection<Price> Prices { get; set; }
+    public string? Ticker { get; set; } = default;
+    public string? Region { get; set; } = default;
+    public string? Sector { get; set; } = default;
+    public virtual ICollection<Price>? Prices { get; set; } = default;
 }
