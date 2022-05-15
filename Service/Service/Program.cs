@@ -46,4 +46,8 @@ app.UseAuthorization();
 
 app.MapControllers();
 
+using var scope = app.Services.CreateScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<QuantDataContext>();
+DbInitialiser.Initialise(dbContext);
+
 app.Run();
