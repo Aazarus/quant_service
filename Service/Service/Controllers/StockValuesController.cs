@@ -27,7 +27,7 @@ public class StockValuesController : ControllerBase
         return _context.Symbols!;
     }
 
-    [HttpGet(":id")]
+    [HttpGet("{id}")]
     public Symbol GetSymbol(int id)
     {
         return (_context.Symbols == null
