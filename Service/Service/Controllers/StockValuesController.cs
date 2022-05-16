@@ -24,8 +24,15 @@ public class StockValuesController : ControllerBase
     [HttpGet]
     public IEnumerable<Symbol> GetSymbols()
     {
-        if (_context.Symbols == null) return new List<Symbol>();
+        return _context.Symbols!;
+    }
 
-        return _context.Symbols;
+    [HttpGet(":id")]
+    public Symbol GetSymbol(int id)
+    {
+        return (_context.Symbols == null
+                   ? new Symbol()
+                   : _context.Symbols.FirstOrDefault(symbol => symbol.SymbolId == id)) ??
+               throw new InvalidOperationException($"Could not find Symbol with id: {id}");
     }
 }

@@ -4,6 +4,7 @@
 
 namespace Service.Tests.Controllers;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Data;
@@ -40,6 +41,32 @@ public class StockValuesControllerTests
 
         // Assert
         actual.Should().BeEquivalentTo(_symbols);
+    }
+
+    [Fact]
+    public void GetSymbol_ShouldReturnASingleSymbolForAValidId()
+    {
+        // Arrange
+        int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
+
+        // Act
+        var actual = _controller.GetSymbol(id);
+
+        // Assert
+        actual.Should().BeEquivalentTo(TestData.Symbols.FirstOrDefault()!);
+    }
+
+    [Fact]
+    public void GetSymbol_ShouldThrowAnExceptionForAnInvalidId()
+    {
+        // Arrange
+        const int id = -1;
+
+        // Act
+        var actual = Assert.Throws<InvalidOperationException>(() => _controller.GetSymbol(id));
+
+        // Assert
+        actual.Message.Should().Be("Could not find Symbol with id: -1");
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
