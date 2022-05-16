@@ -8,14 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 public class QuantDataContext : DbContext
 {
+    protected QuantDataContext()
+    {
+    }
+
     public QuantDataContext(DbContextOptions<QuantDataContext> options)
         : base(options)
     {
     }
 
-    public DbSet<Symbol>? Symbols { get; set; }
-    public DbSet<Price>? Prices { get; set; }
-    public DbSet<IndexData>? IndexData { get; set; }
+    public virtual DbSet<Symbol>? Symbols { get; set; }
+    public virtual DbSet<Price>? Prices { get; set; }
+    public virtual DbSet<IndexData>? IndexData { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
