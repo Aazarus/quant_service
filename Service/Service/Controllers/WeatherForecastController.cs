@@ -5,6 +5,7 @@
 namespace Service.Controllers;
 
 using Microsoft.AspNetCore.Mvc;
+using Models;
 
 [ApiController]
 [Route("[controller]")]
