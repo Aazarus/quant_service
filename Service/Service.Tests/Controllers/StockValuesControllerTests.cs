@@ -18,8 +18,8 @@ using Xunit;
 
 public class StockValuesControllerTests
 {
-    private readonly StockValuesController _controller;
     private readonly Mock<ILogger<StockValuesController>> _logger;
+    private StockValuesController _controller = null!;
     private IEnumerable<IndexData>? _indexData;
     private Mock<QuantDataContext>? _mockDbContext;
     private IEnumerable<Price>? _prices;
@@ -27,15 +27,79 @@ public class StockValuesControllerTests
 
     public StockValuesControllerTests()
     {
+        SetMockData();
         SetupDatabaseMocks();
         _logger = new Mock<ILogger<StockValuesController>>();
+    }
+
+    [Fact]
+    public void ConfirmDataCheckedAndReadyLogged()
+    {
+        // Arrange
         _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+
+        // Act
+        // Assert
+        _logger.Verify(logger => logger.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == "Data checked and ready."),
+            null,
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public void ConfirmExceptionThrownIfNoSymbolsAvailable()
+    {
+        // Arrange
+        DbSet<Symbol>? symbols = null;
+        _mockDbContext = new Mock<QuantDataContext>();
+        _mockDbContext.Setup(x => x.Symbols).Returns(symbols);
+
+        // Act
+        Assert.Throws<InvalidOperationException>(() =>
+            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+        );
+
+        // Assert
+        _logger.Verify(logger => logger.Log(
+            LogLevel.Critical,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == "No Symbols available."),
+            It.IsAny<InvalidOperationException>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public void ConfirmExceptionThrownIfNoPricesAvailable()
+    {
+        // Arrange
+        var mockSymbols = CreateDbSetMock(_symbols!);
+        DbSet<Price>? prices = null;
+        _mockDbContext = new Mock<QuantDataContext>();
+        _mockDbContext.Setup(x => x.Symbols).Returns(mockSymbols.Object);
+        _mockDbContext.Setup(x => x.Prices).Returns(prices);
+
+        // Act
+        Assert.Throws<InvalidOperationException>(() =>
+            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+        );
+
+        // Assert
+        _logger.Verify(logger => logger.Log(
+            LogLevel.Critical,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == "No Prices available."),
+            It.IsAny<InvalidOperationException>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
     }
 
     [Fact]
     public void GetSymbols_ShouldReturnTheFullCollection()
     {
         // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+
         // Act
         var actual = _controller.GetSymbols();
 
@@ -47,6 +111,7 @@ public class StockValuesControllerTests
     public void GetSymbol_ShouldReturnASingleSymbolForAValidId()
     {
         // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
 
         // Act
@@ -57,16 +122,17 @@ public class StockValuesControllerTests
     }
 
     [Fact]
-    public void GetSymbol_ShouldThrowAnExceptionForAnInvalidId()
+    public void GetSymbol_ShouldReturnNullForAnInvalidId()
     {
         // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
         const int id = -1;
 
         // Act
-        var actual = Assert.Throws<InvalidOperationException>(() => _controller.GetSymbol(id));
+        var actual = _controller.GetSymbol(id);
 
         // Assert
-        actual.Message.Should().Be("Could not find Symbol with id: -1");
+        actual.Should().BeNull();
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
@@ -82,14 +148,18 @@ public class StockValuesControllerTests
         return dbSetMock;
     }
 
-    private void SetupDatabaseMocks()
+    private void SetMockData()
     {
         _symbols = TestData.Symbols;
         _indexData = TestData.IndexData;
         _prices = TestData.Prices;
-        var mockSymbols = CreateDbSetMock(_symbols);
-        var mockIndexData = CreateDbSetMock(_indexData);
-        var mockPrices = CreateDbSetMock(_prices);
+    }
+
+    private void SetupDatabaseMocks()
+    {
+        var mockSymbols = CreateDbSetMock(_symbols!);
+        var mockIndexData = CreateDbSetMock(_indexData!);
+        var mockPrices = CreateDbSetMock(_prices!);
         _mockDbContext = new Mock<QuantDataContext>();
         _mockDbContext.Setup(x => x.Symbols).Returns(mockSymbols.Object);
         _mockDbContext.Setup(x => x.IndexData).Returns(mockIndexData.Object);

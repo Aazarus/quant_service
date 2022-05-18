@@ -19,20 +19,35 @@ public class StockValuesController : ControllerBase
     {
         _context = context;
         _logger = logger;
+        ConfirmReady();
     }
 
     [HttpGet]
-    public IEnumerable<Symbol> GetSymbols()
+    public IEnumerable<Symbol>? GetSymbols()
     {
-        return _context.Symbols!;
+        return _context.Symbols;
     }
 
-    [HttpGet("{id}")]
-    public Symbol GetSymbol(int id)
+    [HttpGet("{id:int}")]
+    public Symbol? GetSymbol(int id)
     {
-        return (_context.Symbols == null
-                   ? new Symbol()
-                   : _context.Symbols.FirstOrDefault(symbol => symbol.SymbolId == id)) ??
-               throw new InvalidOperationException($"Could not find Symbol with id: {id}");
+        return _context.Symbols!.FirstOrDefault(symbol => symbol.SymbolId == id);
+    }
+
+    private void ConfirmReady()
+    {
+        if (_context.Symbols == null)
+        {
+            _logger.LogCritical("No Symbols available.");
+            throw new InvalidOperationException("No Symbols available.");
+        }
+
+        if (_context.Prices == null)
+        {
+            _logger.LogCritical("No Prices available.");
+            throw new InvalidOperationException("No Prices available.");
+        }
+
+        _logger.LogInformation("Data checked and ready.");
     }
 }
