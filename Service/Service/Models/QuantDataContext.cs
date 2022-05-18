@@ -4,8 +4,10 @@
 
 namespace Service.Models;
 
+using System.Diagnostics.CodeAnalysis;
 using Microsoft.EntityFrameworkCore;
 
+[ExcludeFromCodeCoverage]
 public class QuantDataContext : DbContext
 {
     protected QuantDataContext()
