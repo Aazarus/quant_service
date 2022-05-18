@@ -117,6 +117,16 @@ public class StockValuesController : ControllerBase
         return Ok(symbol.SymbolId);
     }
 
+    [HttpDelete("{id:int}")]
+    public void DeleteStock(int id)
+    {
+        var prices = _context.Prices!.FirstOrDefault(p => p.SymbolId == id);
+        if (prices != null) _context.Prices!.RemoveRange(prices);
+
+        _context.Symbols!.Remove(new Symbol {SymbolId = id});
+        _context.SaveChanges();
+    }
+
     private void ConfirmReady()
     {
         if (_context.Symbols == null)

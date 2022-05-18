@@ -517,6 +517,42 @@ public class StockValuesControllerTests
             .Be("Symbol with ticker: 'IBM' found but no Prices available for given start and end dates.");
     }
 
+    [Fact]
+    public void Delete_ShouldDeletePricesAndSymbolBySymbolId()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
+
+        // Act
+        _controller.DeleteStock(id);
+
+        // Assert
+        // Once for controller instantiation and twice for delete
+        _mockDbContext.VerifyGet(ctx => ctx.Prices, Times.Exactly(3));
+        // Once for controller instantiation and once for delete
+        _mockDbContext.VerifyGet(ctx => ctx.Symbols, Times.Exactly(2));
+        _mockDbContext.Verify(ctx => ctx.SaveChanges(), Times.Once());
+    }
+
+    [Fact]
+    public void Delete_ShouldDeleteOnlySymbolBySymbolIdIfNoPrices()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        int id = TestData.Symbols.Last().SymbolId;
+
+        // Act
+        _controller.DeleteStock(id);
+
+        // Assert
+        // Once for controller instantiation and once for delete
+        _mockDbContext.VerifyGet(ctx => ctx.Prices, Times.Exactly(2));
+        // Once for controller instantiation and once for delete
+        _mockDbContext.VerifyGet(ctx => ctx.Symbols, Times.Exactly(2));
+        _mockDbContext.Verify(ctx => ctx.SaveChanges(), Times.Once());
+    }
+
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
     {
         var elementsAsQueryable = elements.AsQueryable();
