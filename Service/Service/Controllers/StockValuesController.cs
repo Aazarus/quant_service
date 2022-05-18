@@ -56,6 +56,25 @@ public class StockValuesController : ControllerBase
         return Ok(stock);
     }
 
+    [HttpGet("with-ticker/{ticker}")]
+    public Symbol? GetSymbolWithTicker(string ticker)
+    {
+        return _context.Symbols!.FirstOrDefault(t => t.Ticker == ticker);
+    }
+
+    [HttpPost]
+    public IActionResult CreateSymbol([FromBody] Symbol symbol)
+    {
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var existingSymbol = GetSymbolWithTicker(symbol.Ticker!);
+        if (existingSymbol != null) return Ok(existingSymbol.SymbolId);
+
+        _context.Add(symbol);
+        _context.SaveChanges();
+        return Ok(symbol.SymbolId);
+    }
+
     private void ConfirmReady()
     {
         if (_context.Symbols == null)

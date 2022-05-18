@@ -177,7 +177,7 @@ public class StockValuesControllerTests
         var actualObj = actual as NotFoundObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(404);
-        actualObj!.Value.Should().Be("Symbol with id: '1001' not found.");
+        actualObj.Value.Should().Be("Symbol with id: '1001' not found.");
     }
 
     [Fact]
@@ -198,8 +198,96 @@ public class StockValuesControllerTests
         var actualObj = actual as NotFoundObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(404);
-        actualObj!.Value.Should()
+        actualObj.Value.Should()
             .Be("Symbol with id: '1' found but no Prices available for given start and end dates.");
+    }
+
+    [Fact]
+    public void GetSymbolWithTicker_ShouldReturnASymbolUsingAValidTickerId()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var expected = TestData.Symbols.FirstOrDefault()!;
+
+        // Act
+        var actual = _controller.GetSymbolWithTicker(expected.Ticker!);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void GetSymbolWithTicker_ShouldReturnNullForAnUnknownTicker()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "abcdef";
+
+        // Act
+        var actual = _controller.GetSymbolWithTicker(ticker);
+
+        // Assert
+        actual.Should().BeNull();
+    }
+
+    [Fact]
+    public void CreateSymbol_ReturnsOKForValidNewSymbol()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var newTicker = new Symbol
+        {
+            Ticker = "ABC",
+            Region = "US",
+            Sector = "Information Technology"
+        };
+
+        // Act
+        var actual = _controller.CreateSymbol(newTicker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(OkObjectResult));
+        ((OkObjectResult) actual).StatusCode.Should().Be(200);
+    }
+
+    [Fact]
+    public void CreateSymbol_ReturnsOKWithExistingSymbolIfPresent()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var expected = TestData.Symbols.First();
+        var newTicker = new Symbol
+        {
+            Ticker = expected.Ticker
+        };
+
+        // Act
+        var actual = _controller.CreateSymbol(newTicker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(OkObjectResult));
+        var actualObj = actual as OkObjectResult;
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().Be(expected.SymbolId);
+    }
+
+    [Fact]
+    public void CreateSymbol_InvalidModelReturnsBadRequest()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller.ModelState.AddModelError("Error", "Error occurred");
+
+        // Act
+        var actual = _controller.CreateSymbol(new Symbol());
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        ((BadRequestObjectResult) actual).StatusCode.Should().Be(400);
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
