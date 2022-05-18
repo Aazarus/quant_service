@@ -167,8 +167,6 @@ public class StockValuesControllerTests
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
         var start = string.Empty;
         const string end = "2017-11-11";
-        var expected = TestData.Symbols.FirstOrDefault()!;
-        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
 
         // Act
         var actual = _controller.GetSymbolAndPrices(id, start, end);
@@ -190,8 +188,6 @@ public class StockValuesControllerTests
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
         const string start = "2017-11-07";
         var end = string.Empty;
-        var expected = TestData.Symbols.FirstOrDefault()!;
-        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
 
         // Act
         var actual = _controller.GetSymbolAndPrices(id, start, end);
@@ -390,6 +386,135 @@ public class StockValuesControllerTests
         actual.Should().NotBeNull();
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
         ((BadRequestObjectResult) actual).StatusCode.Should().Be(400);
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnASymbolWithPricesByTicker()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "IBM";
+        const string start = "2017-11-07";
+        const string end = "2017-11-11";
+        var expected = TestData.Symbols.FirstOrDefault()!;
+        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().BeOfType(typeof(OkObjectResult));
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyTicker()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var ticker = string.Empty;
+        const string start = "2017-11-05";
+        const string end = "2017-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyStart()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "IBM";
+        var start = string.Empty;
+        const string end = "2017-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyEnd()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "IBM";
+        const string start = "2017-11-05";
+        var end = string.Empty;
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnNotFoundForUnknownId()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "abcde";
+        const string start = "2017-11-07";
+        const string end = "2017-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be("Symbol with ticker: 'abcde' not found.");
+    }
+
+    [Fact]
+    public void GetSymbolAndPriceWithTicker_ShouldReturnNotFoundForTickerWithNoPrices()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string ticker = "IBM";
+        const string start = "2020-11-07";
+        const string end = "2020-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPriceWithTicker(ticker, start, end);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should()
+            .Be("Symbol with ticker: 'IBM' found but no Prices available for given start and end dates.");
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
