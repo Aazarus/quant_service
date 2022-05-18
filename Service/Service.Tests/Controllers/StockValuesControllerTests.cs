@@ -135,6 +135,24 @@ public class StockValuesControllerTests
         actual.Should().BeNull();
     }
 
+    [Fact]
+    public void GetSymbolAndPrices_ShouldReturnASymbolWithPrices()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
+        const string start = "2017-11-07";
+        const string end = "2017-11-11";
+        var expected = TestData.Symbols.FirstOrDefault()!;
+        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
+
+        // Act
+        var actual = _controller.GetSymbolAndPrices(id, start, end);
+
+        // Assert
+        actual.Should().BeEquivalentTo(expected);
+    }
+
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
     {
         var elementsAsQueryable = elements.AsQueryable();

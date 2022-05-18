@@ -4,6 +4,7 @@
 
 namespace Service.Controllers;
 
+using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 
@@ -32,6 +33,22 @@ public class StockValuesController : ControllerBase
     public Symbol? GetSymbol(int id)
     {
         return _context.Symbols!.FirstOrDefault(symbol => symbol.SymbolId == id);
+    }
+
+    [HttpGet("{id:int}/{start}/{end}")]
+    public Symbol? GetSymbolAndPrices(int id, string start, string end)
+    {
+        var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var stock = _context.Symbols!.FirstOrDefault(symbol => symbol.SymbolId == id);
+
+        stock.Prices = _context.Prices.Where(p =>
+                p.SymbolId == id &&
+                p.Date >= startDate &&
+                p.Date <= endDate)
+            .OrderBy(d => d.Date).ToList();
+
+        return stock;
     }
 
     private void ConfirmReady()
