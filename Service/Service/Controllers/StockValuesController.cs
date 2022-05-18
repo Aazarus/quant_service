@@ -75,6 +75,20 @@ public class StockValuesController : ControllerBase
         return Ok(symbol.SymbolId);
     }
 
+    [HttpPut]
+    public IActionResult UpdateSymbol([FromBody] Symbol symbol)
+    {
+        if (!ModelState.IsValid)
+            return BadRequest(ModelState);
+
+        if (!_context.Symbols!.Any(sym => sym.SymbolId == symbol.SymbolId))
+            return BadRequest($"Symbol with Id: '{symbol.SymbolId}' does not exist.");
+
+        _context.Symbols!.Update(symbol);
+        _context.SaveChanges();
+        return Ok(symbol.SymbolId);
+    }
+
     private void ConfirmReady()
     {
         if (_context.Symbols == null)

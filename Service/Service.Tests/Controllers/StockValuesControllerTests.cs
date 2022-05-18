@@ -290,6 +290,62 @@ public class StockValuesControllerTests
         ((BadRequestObjectResult) actual).StatusCode.Should().Be(400);
     }
 
+    [Fact]
+    public void UpdateSymbol_UpdatesValidSymbol()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var expected = TestData.Symbols.First();
+        expected.Region = "Uk";
+
+        // Act
+        var actual = _controller.UpdateSymbol(expected);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(OkObjectResult));
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj!.Value.Should().BeEquivalentTo(expected.SymbolId);
+    }
+
+    [Fact]
+    public void UpdateSymbol_UnknownSymbolReturnsBadRequest()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var expected = new Symbol
+        {
+            Ticker = "abcde"
+        };
+
+
+        // Act
+        var actual = _controller.UpdateSymbol(expected);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        ((BadRequestObjectResult) actual).StatusCode.Should().Be(400);
+    }
+
+    [Fact]
+    public void UpdateSymbol_InvalidModelReturnsBadRequest()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller.ModelState.AddModelError("Error", "Error occurred");
+
+        // Act
+        var actual = _controller.UpdateSymbol(new Symbol());
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        ((BadRequestObjectResult) actual).StatusCode.Should().Be(400);
+    }
+
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
     {
         var elementsAsQueryable = elements.AsQueryable();
