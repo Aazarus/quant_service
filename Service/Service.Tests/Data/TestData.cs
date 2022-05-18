@@ -81,7 +81,8 @@ public class TestData
             Low = 150.28m,
             Close = 151.57m,
             CloseAdj = 145.4044m,
-            Volume = 4634400m
+            Volume = 4634400m,
+            SymbolId = 1
         },
         new()
         {
@@ -92,7 +93,8 @@ public class TestData
             Low = 149.86m,
             Close = 150.3m,
             CloseAdj = 145.6272m,
-            Volume = 4776500m
+            Volume = 4776500m,
+            SymbolId = 2
         },
         new()
         {
@@ -103,7 +105,8 @@ public class TestData
             Low = 149.14m,
             Close = 149.16m,
             CloseAdj = 144.5227m,
-            Volume = 4307300m
+            Volume = 4307300m,
+            SymbolId = 2
         },
         new()
         {
@@ -114,7 +117,8 @@ public class TestData
             Low = 147.92m,
             Close = 148.40m,
             CloseAdj = 143.7863m,
-            Volume = 5107500m
+            Volume = 5107500m,
+            SymbolId = 1
         }
     };
 }
