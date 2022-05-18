@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Data;
 using FluentAssertions;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Models;
@@ -150,7 +151,55 @@ public class StockValuesControllerTests
         var actual = _controller.GetSymbolAndPrices(id, start, end);
 
         // Assert
-        actual.Should().BeEquivalentTo(expected);
+        actual.Should().BeOfType(typeof(OkObjectResult));
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public void GetSymbolAndPrices_ShouldReturnNotFoundForUnknownId()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const int id = 1001;
+        const string start = "2017-11-07";
+        const string end = "2017-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPrices(id, start, end);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj!.Value.Should().Be("Symbol with id: '1001' not found.");
+    }
+
+    [Fact]
+    public void GetSymbolAndPrices_ShouldReturnNotFoundForIdWithNoPrices()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const int id = 1;
+        const string start = "2020-11-07";
+        const string end = "2020-11-11";
+
+        // Act
+        var actual = _controller.GetSymbolAndPrices(id, start, end);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj!.Value.Should()
+            .Be("Symbol with id: '1' found but no Prices available for given start and end dates.");
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class

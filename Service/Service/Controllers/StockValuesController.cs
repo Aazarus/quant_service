@@ -36,19 +36,24 @@ public class StockValuesController : ControllerBase
     }
 
     [HttpGet("{id:int}/{start}/{end}")]
-    public Symbol? GetSymbolAndPrices(int id, string start, string end)
+    public IActionResult GetSymbolAndPrices(int id, string start, string end)
     {
         var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        var stock = _context.Symbols!.FirstOrDefault(symbol => symbol.SymbolId == id);
+        var stock = _context.Symbols!.FirstOrDefault(sym => sym.SymbolId == id);
 
-        stock.Prices = _context.Prices.Where(p =>
+        if (stock == null) return NotFound($"Symbol with id: '{id}' not found.");
+
+        stock.Prices = _context.Prices!.Where(p =>
                 p.SymbolId == id &&
                 p.Date >= startDate &&
                 p.Date <= endDate)
             .OrderBy(d => d.Date).ToList();
 
-        return stock;
+        if (!stock.Prices.Any())
+            return NotFound($"Symbol with id: '{id}' found but no Prices available for given start and end dates.");
+
+        return Ok(stock);
     }
 
     private void ConfirmReady()
