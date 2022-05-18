@@ -65,6 +65,31 @@ public class StockValuesController : ControllerBase
         return _context.Symbols!.FirstOrDefault(t => t.Ticker == ticker);
     }
 
+    [HttpGet("with-prices-and-ticker/{ticker}/{start}/{end}")]
+    public IActionResult GetSymbolAndPriceWithTicker(string ticker, string start, string end)
+    {
+        if (string.IsNullOrWhiteSpace(ticker) || string.IsNullOrWhiteSpace(start) || string.IsNullOrWhiteSpace(end))
+            return BadRequest("Invalid argument provided");
+
+        var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var stock = _context.Symbols!.FirstOrDefault(sym => sym.Ticker == ticker);
+
+        if (stock == null) return NotFound($"Symbol with ticker: '{ticker}' not found.");
+
+        stock.Prices = _context.Prices!.Where(p =>
+                p.SymbolId == stock.SymbolId &&
+                p.Date >= startDate &&
+                p.Date <= endDate)
+            .OrderBy(d => d.Date).ToList();
+
+        if (!stock.Prices.Any())
+            return NotFound(
+                $"Symbol with ticker: '{ticker}' found but no Prices available for given start and end dates.");
+
+        return Ok(stock);
+    }
+
     [HttpPost]
     public IActionResult CreateSymbol([FromBody] Symbol symbol)
     {
@@ -90,31 +115,6 @@ public class StockValuesController : ControllerBase
         _context.Symbols!.Update(symbol);
         _context.SaveChanges();
         return Ok(symbol.SymbolId);
-    }
-
-    [HttpGet("with-prices-and-ticker/{ticker}/{start}/{end}")]
-    public IActionResult GetSymbolAndPriceWithTicker(string ticker, string start, string end)
-    {
-        if (string.IsNullOrWhiteSpace(ticker) || string.IsNullOrWhiteSpace(start) || string.IsNullOrWhiteSpace(end))
-            return BadRequest("Invalid argument provided");
-
-        var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
-        var stock = _context.Symbols!.FirstOrDefault(sym => sym.Ticker == ticker);
-
-        if (stock == null) return NotFound($"Symbol with ticker: '{ticker}' not found.");
-
-        stock.Prices = _context.Prices!.Where(p =>
-                p.SymbolId == stock.SymbolId &&
-                p.Date >= startDate &&
-                p.Date <= endDate)
-            .OrderBy(d => d.Date).ToList();
-
-        if (!stock.Prices.Any())
-            return NotFound(
-                $"Symbol with ticker: '{ticker}' found but no Prices available for given start and end dates.");
-
-        return Ok(stock);
     }
 
     private void ConfirmReady()
