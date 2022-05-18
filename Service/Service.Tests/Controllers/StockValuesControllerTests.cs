@@ -160,6 +160,52 @@ public class StockValuesControllerTests
     }
 
     [Fact]
+    public void GetSymbolAndPrices_ShouldReturnBadRequestForEmptyStart()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
+        var start = string.Empty;
+        const string end = "2017-11-11";
+        var expected = TestData.Symbols.FirstOrDefault()!;
+        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
+
+        // Act
+        var actual = _controller.GetSymbolAndPrices(id, start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetSymbolAndPrices_ShouldReturnBadRequestForEmptyEnd()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
+        const string start = "2017-11-07";
+        var end = string.Empty;
+        var expected = TestData.Symbols.FirstOrDefault()!;
+        expected.Prices = TestData.Prices.Where(price => price.SymbolId == 1).ToList();
+
+        // Act
+        var actual = _controller.GetSymbolAndPrices(id, start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
     public void GetSymbolAndPrices_ShouldReturnNotFoundForUnknownId()
     {
         // Arrange
@@ -307,7 +353,7 @@ public class StockValuesControllerTests
         var actualObj = actual as OkObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
-        actualObj!.Value.Should().BeEquivalentTo(expected.SymbolId);
+        actualObj.Value.Should().BeEquivalentTo(expected.SymbolId);
     }
 
     [Fact]

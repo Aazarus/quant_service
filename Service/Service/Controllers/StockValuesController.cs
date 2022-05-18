@@ -38,6 +38,9 @@ public class StockValuesController : ControllerBase
     [HttpGet("{id:int}/{start}/{end}")]
     public IActionResult GetSymbolAndPrices(int id, string start, string end)
     {
+        if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
+            return BadRequest("Invalid argument provided");
+
         var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
         var stock = _context.Symbols!.FirstOrDefault(sym => sym.SymbolId == id);
@@ -88,6 +91,7 @@ public class StockValuesController : ControllerBase
         _context.SaveChanges();
         return Ok(symbol.SymbolId);
     }
+
 
     private void ConfirmReady()
     {
