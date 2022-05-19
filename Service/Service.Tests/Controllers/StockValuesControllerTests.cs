@@ -96,6 +96,33 @@ public class StockValuesControllerTests
     }
 
     [Fact]
+    public void ConfirmExceptionThrownIfNoIndexDataAvailable()
+    {
+        // Arrange
+        var mockSymbols = CreateDbSetMock(_symbols!);
+        var mockPrices = CreateDbSetMock(_prices!);
+        DbSet<IndexData>? indexData = null;
+        _mockDbContext = new Mock<QuantDataContext>();
+        _mockDbContext.Setup(x => x.Symbols).Returns(mockSymbols.Object);
+        _mockDbContext.Setup(x => x.Prices).Returns(mockPrices.Object);
+        _mockDbContext.Setup(x => x.IndexData).Returns(indexData);
+
+        // Act
+        Assert.Throws<InvalidOperationException>(() =>
+            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+        );
+
+        // Assert
+        _logger.Verify(logger => logger.Log(
+            LogLevel.Critical,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == "No IndexData available."),
+            It.IsAny<InvalidOperationException>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+
+    [Fact]
     public void GetSymbols_ShouldReturnTheFullCollection()
     {
         // Arrange

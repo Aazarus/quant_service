@@ -23,12 +23,21 @@ public class StockValuesController : ControllerBase
         ConfirmReady();
     }
 
+    /// <summary>
+    ///     Gets all the Symbols.
+    /// </summary>
+    /// <returns>A collection of Symbols.</returns>
     [HttpGet]
     public IEnumerable<Symbol>? GetSymbols()
     {
         return _context.Symbols;
     }
 
+    /// <summary>
+    ///     Gets a single Symbol by Id.
+    /// </summary>
+    /// <param name="id">The Id of the Symbol.</param>
+    /// <returns>An ActionResult.</returns>
     [HttpGet("{id:int}")]
     public Symbol? GetSymbol(int id)
     {
@@ -59,12 +68,24 @@ public class StockValuesController : ControllerBase
         return Ok(stock);
     }
 
+    /// <summary>
+    ///     Gets a single Symbol by the Ticker.
+    /// </summary>
+    /// <param name="ticker">The Ticker for the Symbol.</param>
+    /// <returns>A Symbol.</returns>
     [HttpGet("with-ticker/{ticker}")]
     public Symbol? GetSymbolWithTicker(string ticker)
     {
         return _context.Symbols!.FirstOrDefault(t => t.Ticker == ticker);
     }
 
+    /// <summary>
+    ///     Gets a single Symbol with Prices.
+    /// </summary>
+    /// <param name="ticker">The Ticker for the Symbol.</param>
+    /// <param name="start">The Start date of the search.</param>
+    /// <param name="end">The End date of the search.</param>
+    /// <returns>An ActionResult</returns>
     [HttpGet("with-prices-and-ticker/{ticker}/{start}/{end}")]
     public IActionResult GetSymbolAndPriceWithTicker(string ticker, string start, string end)
     {
@@ -90,6 +111,11 @@ public class StockValuesController : ControllerBase
         return Ok(stock);
     }
 
+    /// <summary>
+    ///     Creates a new entry for a valid Symbol.
+    /// </summary>
+    /// <param name="symbol">The Symbol to add.</param>
+    /// <returns>An ActionResult.</returns>
     [HttpPost]
     public IActionResult CreateSymbol([FromBody] Symbol symbol)
     {
@@ -103,6 +129,11 @@ public class StockValuesController : ControllerBase
         return Ok(symbol.SymbolId);
     }
 
+    /// <summary>
+    ///     Updates an existing Symbol.
+    /// </summary>
+    /// <param name="symbol">The updated Symbol.</param>
+    /// <returns>An ActionResult.</returns>
     [HttpPut]
     public IActionResult UpdateSymbol([FromBody] Symbol symbol)
     {
@@ -117,6 +148,10 @@ public class StockValuesController : ControllerBase
         return Ok(symbol.SymbolId);
     }
 
+    /// <summary>
+    ///     Deletes a Symbol from the Database along with any Prices.
+    /// </summary>
+    /// <param name="id">The Id of the Symbol.</param>
     [HttpDelete("{id:int}")]
     public void DeleteStock(int id)
     {
@@ -127,12 +162,22 @@ public class StockValuesController : ControllerBase
         _context.SaveChanges();
     }
 
+    /// <summary>
+    ///     Gets all the IndexData.
+    /// </summary>
+    /// <returns>A collection of IndexData.</returns>
     [HttpGet("index-data")]
     public IEnumerable<IndexData>? GetIndexData()
     {
         return _context.IndexData;
     }
 
+    /// <summary>
+    ///     Gets all the IndexData within the Start and End date.
+    /// </summary>
+    /// <param name="start">The Start date of the search.</param>
+    /// <param name="end">The End date of the search.</param>
+    /// <returns>An ActionResult.</returns>
     [HttpGet("index-data/{start}/{end}")]
     public IActionResult GetIndexData(string start, string end)
     {
@@ -161,6 +206,12 @@ public class StockValuesController : ControllerBase
         {
             _logger.LogCritical("No Prices available.");
             throw new InvalidOperationException("No Prices available.");
+        }
+
+        if (_context.IndexData == null)
+        {
+            _logger.LogCritical("No IndexData available.");
+            throw new InvalidOperationException("No IndexData available.");
         }
 
         _logger.LogInformation("Data checked and ready.");
