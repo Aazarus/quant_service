@@ -127,6 +127,28 @@ public class StockValuesController : ControllerBase
         _context.SaveChanges();
     }
 
+    [HttpGet("index-data")]
+    public IEnumerable<IndexData>? GetIndexData()
+    {
+        return _context.IndexData;
+    }
+
+    [HttpGet("index-data/{start}/{end}")]
+    public IActionResult GetIndexData(string start, string end)
+    {
+        if (string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
+            return BadRequest("Invalid argument provided");
+
+        var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+        var endDate = DateTime.ParseExact(end, "yyyy-MM-dd", CultureInfo.InvariantCulture);
+
+        var indexData = _context.IndexData!
+            .Where(d => d.Date >= startDate && d.Date <= endDate)
+            .OrderBy(d => d.Date);
+
+        return Ok(indexData);
+    }
+
     private void ConfirmReady()
     {
         if (_context.Symbols == null)

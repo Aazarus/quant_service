@@ -553,6 +553,85 @@ public class StockValuesControllerTests
         _mockDbContext.Verify(ctx => ctx.SaveChanges(), Times.Once());
     }
 
+    [Fact]
+    public void GetIndexData_ShouldReturnTheFullCollection()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+
+        // Act
+        var actual = _controller.GetIndexData();
+
+        // Assert
+        actual.Should().BeEquivalentTo(_indexData);
+    }
+
+    [Fact]
+    public void GetIndexData_ByDate_ShouldReturnBadRequestForEmptyStart()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        var start = string.Empty;
+        const string end = "2017-11-11";
+
+        // Act
+        var actual = _controller.GetIndexData(start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetIndexData_ByDate_ShouldReturnBadRequestForEmptyEnd()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string start = "2017-11-05";
+        var end = string.Empty;
+
+        // Act
+        var actual = _controller.GetIndexData(start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Invalid argument provided");
+    }
+
+    [Fact]
+    public void GetIndexData_ByDate_ShouldReturnTheACollection()
+    {
+        // Arrange
+        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const string start = "2008-03-09";
+        const string end = "2008-03-11";
+        var expected = new List<IndexData>
+        {
+            (_indexData as List<IndexData>)![0],
+            (_indexData as List<IndexData>)![1],
+            (_indexData as List<IndexData>)![2]
+        };
+
+        // Act
+        var actual = _controller.GetIndexData(start, end);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType(typeof(OkObjectResult));
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().BeEquivalentTo(expected);
+    }
+
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
     {
         var elementsAsQueryable = elements.AsQueryable();
