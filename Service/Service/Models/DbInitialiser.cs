@@ -4,9 +4,11 @@
 
 namespace Service.Models;
 
+using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
 using Helpers;
 
+[ExcludeFromCodeCoverage]
 public class DbInitialiser
 {
     public static void Initialise(QuantDataContext context)
