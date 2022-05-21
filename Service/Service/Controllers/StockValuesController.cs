@@ -86,7 +86,7 @@ public class StockValuesController : ControllerBase
     /// <param name="start">The Start date of the search.</param>
     /// <param name="end">The End date of the search.</param>
     /// <returns>An ActionResult</returns>
-    [HttpGet("with-prices-and-ticker/{ticker}/{start}/{end}")]
+    [HttpGet("and-prices-with-ticker/{ticker}/{start}/{end}")]
     public IActionResult GetSymbolAndPriceWithTicker(string ticker, string start, string end)
     {
         if (string.IsNullOrWhiteSpace(ticker) || string.IsNullOrWhiteSpace(start) || string.IsNullOrWhiteSpace(end))
