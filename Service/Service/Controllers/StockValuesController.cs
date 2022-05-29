@@ -132,15 +132,16 @@ public class StockValuesController : ControllerBase
     /// <summary>
     ///     Updates an existing Symbol.
     /// </summary>
+    /// <param name="id">The ID of the symbol to update.</param>
     /// <param name="symbol">The updated Symbol.</param>
     /// <returns>An ActionResult.</returns>
-    [HttpPut]
-    public IActionResult UpdateSymbol([FromBody] Symbol symbol)
+    [HttpPut("{id:int}")]
+    public IActionResult UpdateSymbol(int id, [FromBody] Symbol symbol)
     {
         if (!ModelState.IsValid)
             return BadRequest(ModelState);
 
-        if (!_context.Symbols!.Any(sym => sym.SymbolId == symbol.SymbolId))
+        if (!_context.Symbols!.Any(sym => sym.SymbolId == id))
             return BadRequest($"Symbol with Id: '{symbol.SymbolId}' does not exist.");
 
         _context.Symbols!.Update(symbol);
