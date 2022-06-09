@@ -4,6 +4,8 @@
 
 using Microsoft.EntityFrameworkCore;
 using Service.Models;
+using Service.Services;
+using Service.Wrapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,6 +14,9 @@ builder.Services.AddDbContext<QuantDataContext>(options =>
 {
     options.UseSqlServer(builder.Configuration["Data:Quant:ConnectionString"]);
 });
+
+builder.Services.AddSingleton<IYahooQuotesApiWrapper, YahooQuotesApiWrapper>();
+builder.Services.AddSingleton<IYahooService, YahooService>();
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
