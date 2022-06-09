@@ -4,6 +4,9 @@
 
 namespace Service.Models;
 
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class Symbol
 {
     public int SymbolId { get; set; }
