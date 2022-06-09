@@ -89,7 +89,7 @@ public class StockValuesController : ControllerBase
     [HttpGet("and-prices-with-ticker/{ticker}/{start}/{end}")]
     public IActionResult GetSymbolAndPriceWithTicker(string ticker, string start, string end)
     {
-        if (string.IsNullOrWhiteSpace(ticker) || string.IsNullOrWhiteSpace(start) || string.IsNullOrWhiteSpace(end))
+        if (string.IsNullOrEmpty(ticker) || string.IsNullOrEmpty(start) || string.IsNullOrEmpty(end))
             return BadRequest("Invalid argument provided");
 
         var startDate = DateTime.ParseExact(start, "yyyy-MM-dd", CultureInfo.InvariantCulture);
