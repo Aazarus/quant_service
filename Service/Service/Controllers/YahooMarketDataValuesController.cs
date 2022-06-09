@@ -15,6 +15,10 @@ public class YahooMarketDataValuesController
     private readonly ILogger<YahooMarketDataValuesController> _logger;
     private readonly IYahooService _yahooService;
 
+    /// <summary>
+    /// </summary>
+    /// <param name="logger"></param>
+    /// <param name="yahooService"></param>
     public YahooMarketDataValuesController(
         ILogger<YahooMarketDataValuesController> logger,
         IYahooService yahooService)
@@ -24,12 +28,13 @@ public class YahooMarketDataValuesController
     }
 
     /// <summary>
+    ///     Gets the StockData for a given ticker between start and end dates with period between items.
     /// </summary>
-    /// <param name="ticker"></param>
-    /// <param name="start"></param>
-    /// <param name="end"></param>
-    /// <param name="period"></param>
-    /// <returns></returns>
+    /// <param name="ticker">The ticker.</param>
+    /// <param name="start">The start date.</param>
+    /// <param name="end">The end date.</param>
+    /// <param name="period">The time period between items.</param>
+    /// <returns>A collection of StockData.</returns>
     [Route("{ticker}/{start}/{end}/{period}")]
     [HttpGet]
     public async Task<IEnumerable<StockData>> GetYahooStock(string ticker, string start, string end, string period)

@@ -11,12 +11,24 @@ using Models;
 [Route("api/Stocks")]
 public class StockValuesController : ControllerBase
 {
+    /// <summary>
+    ///     The DB context.
+    /// </summary>
     private readonly QuantDataContext _context;
+
+    /// <summary>
+    ///     The Application Logger
+    /// </summary>
     private readonly ILogger<StockValuesController> _logger;
 
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="StockValuesController" /> class.
+    /// </summary>
+    /// <param name="logger">The Application logger.</param>
+    /// <param name="context">The DB context.</param>
     public StockValuesController(
-        QuantDataContext context,
-        ILogger<StockValuesController> logger)
+        ILogger<StockValuesController> logger,
+        QuantDataContext context)
     {
         _context = context;
         _logger = logger;

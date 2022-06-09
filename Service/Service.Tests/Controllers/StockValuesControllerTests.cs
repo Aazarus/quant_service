@@ -37,7 +37,7 @@ public class StockValuesControllerTests
     public void ConfirmDataCheckedAndReadyLogged()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
 
         // Act
         // Assert
@@ -59,7 +59,7 @@ public class StockValuesControllerTests
 
         // Act
         Assert.Throws<InvalidOperationException>(() =>
-            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+            _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object)
         );
 
         // Assert
@@ -83,7 +83,7 @@ public class StockValuesControllerTests
 
         // Act
         Assert.Throws<InvalidOperationException>(() =>
-            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+            _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object)
         );
 
         // Assert
@@ -109,7 +109,7 @@ public class StockValuesControllerTests
 
         // Act
         Assert.Throws<InvalidOperationException>(() =>
-            _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object)
+            _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object)
         );
 
         // Assert
@@ -126,7 +126,7 @@ public class StockValuesControllerTests
     public void GetSymbols_ShouldReturnTheFullCollection()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
 
         // Act
         var actual = _controller.GetSymbols();
@@ -139,7 +139,7 @@ public class StockValuesControllerTests
     public void GetSymbol_ShouldReturnASingleSymbolForAValidId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
 
         // Act
@@ -153,7 +153,7 @@ public class StockValuesControllerTests
     public void GetSymbol_ShouldReturnNullForAnInvalidId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const int id = -1;
 
         // Act
@@ -167,7 +167,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPrices_ShouldReturnASymbolWithPrices()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
         const string start = "2017-11-07";
         const string end = "2017-11-11";
@@ -190,7 +190,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPrices_ShouldReturnBadRequestForEmptyStart()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
         var start = string.Empty;
         const string end = "2017-11-11";
@@ -211,7 +211,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPrices_ShouldReturnBadRequestForEmptyEnd()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
         const string start = "2017-11-07";
         var end = string.Empty;
@@ -232,7 +232,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPrices_ShouldReturnNotFoundForUnknownId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const int id = 1001;
         const string start = "2017-11-07";
         const string end = "2017-11-11";
@@ -253,7 +253,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPrices_ShouldReturnNotFoundForIdWithNoPrices()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const int id = 1;
         const string start = "2020-11-07";
         const string end = "2020-11-11";
@@ -275,7 +275,7 @@ public class StockValuesControllerTests
     public void GetSymbolWithTicker_ShouldReturnASymbolUsingAValidTickerId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var expected = TestData.Symbols.FirstOrDefault()!;
 
         // Act
@@ -290,7 +290,7 @@ public class StockValuesControllerTests
     public void GetSymbolWithTicker_ShouldReturnNullForAnUnknownTicker()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "abcdef";
 
         // Act
@@ -304,7 +304,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnASymbolWithPricesByTicker()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "IBM";
         const string start = "2017-11-07";
         const string end = "2017-11-11";
@@ -327,7 +327,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyTicker()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var ticker = string.Empty;
         const string start = "2017-11-05";
         const string end = "2017-11-11";
@@ -348,7 +348,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyStart()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "IBM";
         var start = string.Empty;
         const string end = "2017-11-11";
@@ -369,7 +369,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnBadRequestForEmptyEnd()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "IBM";
         const string start = "2017-11-05";
         var end = string.Empty;
@@ -390,7 +390,7 @@ public class StockValuesControllerTests
     public void CreateSymbol_ReturnsOKForValidNewSymbol()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var newTicker = new Symbol
         {
             Ticker = "ABC",
@@ -411,7 +411,7 @@ public class StockValuesControllerTests
     public void CreateSymbol_ReturnsOKWithExistingSymbolIfPresent()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var expected = TestData.Symbols.First();
         var newTicker = new Symbol
         {
@@ -433,7 +433,7 @@ public class StockValuesControllerTests
     public void CreateSymbol_InvalidModelReturnsBadRequest()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         _controller.ModelState.AddModelError("Error", "Error occurred");
 
         // Act
@@ -449,7 +449,7 @@ public class StockValuesControllerTests
     public void UpdateSymbol_UpdatesValidSymbol()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var expected = TestData.Symbols.First();
         expected.Region = "Uk";
 
@@ -469,7 +469,7 @@ public class StockValuesControllerTests
     public void UpdateSymbol_UnknownSymbolReturnsBadRequest()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const int symbolId = 15;
         var expected = new Symbol
         {
@@ -491,7 +491,7 @@ public class StockValuesControllerTests
     public void UpdateSymbol_InvalidModelReturnsBadRequest()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         _controller.ModelState.AddModelError("Error", "Error occurred");
 
         // Act
@@ -507,7 +507,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnNotFoundForUnknownId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "abcde";
         const string start = "2017-11-07";
         const string end = "2017-11-11";
@@ -528,7 +528,7 @@ public class StockValuesControllerTests
     public void GetSymbolAndPriceWithTicker_ShouldReturnNotFoundForTickerWithNoPrices()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string ticker = "IBM";
         const string start = "2020-11-07";
         const string end = "2020-11-11";
@@ -550,7 +550,7 @@ public class StockValuesControllerTests
     public void Delete_ShouldDeletePricesAndSymbolBySymbolId()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.FirstOrDefault()!.SymbolId;
 
         // Act
@@ -568,7 +568,7 @@ public class StockValuesControllerTests
     public void Delete_ShouldDeleteOnlySymbolBySymbolIdIfNoPrices()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         int id = TestData.Symbols.Last().SymbolId;
 
         // Act
@@ -586,7 +586,7 @@ public class StockValuesControllerTests
     public void GetIndexData_ShouldReturnTheFullCollection()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
 
         // Act
         var actual = _controller.GetIndexData();
@@ -599,7 +599,7 @@ public class StockValuesControllerTests
     public void GetIndexData_ByDate_ShouldReturnBadRequestForEmptyStart()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         var start = string.Empty;
         const string end = "2017-11-11";
 
@@ -619,7 +619,7 @@ public class StockValuesControllerTests
     public void GetIndexData_ByDate_ShouldReturnBadRequestForEmptyEnd()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string start = "2017-11-05";
         var end = string.Empty;
 
@@ -639,7 +639,7 @@ public class StockValuesControllerTests
     public void GetIndexData_ByDate_ShouldReturnTheACollection()
     {
         // Arrange
-        _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
         const string start = "2008-03-09";
         const string end = "2008-03-11";
         var expected = new List<IndexData>
