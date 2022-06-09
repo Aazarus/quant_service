@@ -7,6 +7,9 @@ namespace Service.Tests.Data;
 using System;
 using System.Collections.Generic;
 using Models;
+using NodaTime;
+using YahooQuotesApi;
+using Symbol = Models.Symbol;
 
 public class TestData
 {
@@ -119,6 +122,98 @@ public class TestData
             CloseAdj = 143.7863m,
             Volume = 5107500m,
             SymbolId = 1
+        }
+    };
+
+    public static IEnumerable<PriceTick> SecurityPriceHistory = new List<PriceTick>
+    {
+        new
+        (
+            LocalDate.FromDateTime(new DateTime(2018, 01, 01, 0, 0, 0)),
+            123.321,
+            124.12,
+            122.891,
+            123.019,
+            123.0,
+            25565416
+        ),
+        new
+        (
+            LocalDate.FromDateTime(new DateTime(2018, 01, 02, 0, 0, 0)),
+            124.321,
+            125.12,
+            122.491,
+            123.019,
+            123.50,
+            25765416
+        ),
+        new
+        (
+            LocalDate.FromDateTime(new DateTime(2018, 01, 03, 0, 0, 0)),
+            123.821,
+            124.412,
+            123.1991,
+            123.719,
+            123.70,
+            37565416
+        ),
+        new
+        (
+            LocalDate.FromDateTime(new DateTime(2018, 01, 04, 0, 0, 0)),
+            124.7521,
+            125.412,
+            123.1991,
+            124.719,
+            124.170,
+            32565416
+        )
+    };
+
+    public static IEnumerable<StockData> StockDataDaily = new List<StockData>
+    {
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-365),
+            Open = 123.321m,
+            High = 124.321m,
+            Low = 122.021m,
+            Close = 124.320m,
+            AdjustedClose = 124.0m,
+            Volume = 32425284
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-364),
+            Open = 124.320m,
+            High = 125.81m,
+            Low = 122.021m,
+            Close = 125.30m,
+            AdjustedClose = 125.0m,
+            Volume = 32443284
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-363),
+            Open = 125.30m,
+            High = 125.481m,
+            Low = 123.021m,
+            Close = 124.30m,
+            AdjustedClose = 124.0m,
+            Volume = 31425284
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-362),
+            Open = 124.30m,
+            High = 126.481m,
+            Low = 122.021m,
+            Close = 124.30m,
+            AdjustedClose = 123.5m,
+            Volume = 41425284
         }
     };
 }
