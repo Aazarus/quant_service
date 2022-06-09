@@ -454,7 +454,7 @@ public class StockValuesControllerTests
         expected.Region = "Uk";
 
         // Act
-        var actual = _controller.UpdateSymbol(expected);
+        var actual = _controller.UpdateSymbol(expected.SymbolId, expected);
 
         // Assert
         actual.Should().NotBeNull();
@@ -470,14 +470,16 @@ public class StockValuesControllerTests
     {
         // Arrange
         _controller = new StockValuesController(_mockDbContext!.Object, _logger.Object);
+        const int symbolId = 15;
         var expected = new Symbol
         {
+            SymbolId = symbolId,
             Ticker = "abcde"
         };
 
 
         // Act
-        var actual = _controller.UpdateSymbol(expected);
+        var actual = _controller.UpdateSymbol(symbolId, expected);
 
         // Assert
         actual.Should().NotBeNull();
@@ -493,7 +495,7 @@ public class StockValuesControllerTests
         _controller.ModelState.AddModelError("Error", "Error occurred");
 
         // Act
-        var actual = _controller.UpdateSymbol(new Symbol());
+        var actual = _controller.UpdateSymbol(-1, new Symbol());
 
         // Assert
         actual.Should().NotBeNull();
@@ -656,7 +658,7 @@ public class StockValuesControllerTests
         var actualObj = actual as OkObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
-        //actualObj.Value.Should().BeEquivalentTo(expected);
+        actualObj.Value.Should().BeEquivalentTo(expected);
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
