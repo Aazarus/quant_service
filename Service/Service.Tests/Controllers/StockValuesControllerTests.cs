@@ -636,7 +636,7 @@ public class StockValuesControllerTests
     }
 
     [Fact]
-    public void GetIndexData_ByDate_ShouldReturnTheACollection()
+    public void GetIndexData_ByDate_ShouldReturnACollection()
     {
         // Arrange
         _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
@@ -658,7 +658,7 @@ public class StockValuesControllerTests
         var actualObj = actual as OkObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
-        actualObj.Value.Should().BeEquivalentTo(expected);
+        actualObj.Value.Should().BeOfType<List<IndexData>>();
     }
 
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class

@@ -202,7 +202,8 @@ public class StockValuesController : ControllerBase
 
         var indexData = _context.IndexData!
             .Where(d => d.Date >= startDate && d.Date <= endDate)
-            .OrderBy(d => d.Date);
+            .OrderBy(d => d.Date)
+            .ToList();
 
         return Ok(indexData);
     }
