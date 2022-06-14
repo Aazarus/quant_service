@@ -179,7 +179,7 @@ public class TestData
             High = 124.321m,
             Low = 122.021m,
             Close = 124.320m,
-            AdjustedClose = 124.0m,
+            CloseAdj = 124.0m,
             Volume = 32425284
         },
         new()
@@ -190,7 +190,7 @@ public class TestData
             High = 125.81m,
             Low = 122.021m,
             Close = 125.30m,
-            AdjustedClose = 125.0m,
+            CloseAdj = 125.0m,
             Volume = 32443284
         },
         new()
@@ -201,7 +201,7 @@ public class TestData
             High = 125.481m,
             Low = 123.021m,
             Close = 124.30m,
-            AdjustedClose = 124.0m,
+            CloseAdj = 124.0m,
             Volume = 31425284
         },
         new()
@@ -212,7 +212,7 @@ public class TestData
             High = 126.481m,
             Low = 122.021m,
             Close = 124.30m,
-            AdjustedClose = 123.5m,
+            CloseAdj = 123.5m,
             Volume = 41425284
         }
     };

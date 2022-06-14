@@ -88,7 +88,7 @@ public class YahooService : IYahooService
                 High = Convert.ToDecimal(h.High),
                 Low = Convert.ToDecimal(h.Low),
                 Close = Convert.ToDecimal(h.Close),
-                AdjustedClose = Convert.ToDecimal(h.AdjustedClose),
+                CloseAdj = Convert.ToDecimal(h.AdjustedClose),
                 Volume = Convert.ToDecimal(h.Volume)
             }).ToList();
     }
