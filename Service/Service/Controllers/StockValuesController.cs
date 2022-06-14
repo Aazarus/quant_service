@@ -208,8 +208,43 @@ public class StockValuesController : ControllerBase
         return Ok(indexData);
     }
 
+    /// <summary>
+    ///     Adds the historical end of day data for a collection of stocks
+    /// </summary>
+    /// <param name="stocks">The stocks to get data for.</param>
+    /// <returns>An IActionResult.</returns>
+    public IActionResult AddStockPrice([FromBody] List<StockData> stocks)
+    {
+        if (!stocks.Any()) return BadRequest("No stocks provided");
+
+        var symbol = GetSymbolWithTicker(stocks.First().Ticker!);
+        if (symbol == null) return BadRequest($"Ticker '{stocks.First().Ticker!}' is unknown.");
+
+        if (!ModelState.IsValid) return BadRequest(ModelState);
+
+        var prices = (from stock in stocks
+            where !_context.Prices!.Any(p => p.Date == stock.Date && p.SymbolId == symbol.SymbolId)
+            select new Price
+            {
+                SymbolId = symbol.SymbolId,
+                Date = stock.Date,
+                Open = stock.Open,
+                High = stock.High,
+                Low = stock.Low,
+                Close = stock.Close,
+                CloseAdj = stock.CloseAdj,
+                Volume = stock.Volume
+            }).ToList();
+
+        _context.Prices!.AddRange(prices);
+        _context.SaveChanges();
+
+        return Ok(prices);
+    }
+
     private void ConfirmReady()
     {
+        // ToDo: If we plugged in a 3rd party log monitor (e.g. NewRelic) then we could use that to monitor issues.
         if (_context.Symbols == null)
         {
             _logger.LogCritical("No Symbols available.");

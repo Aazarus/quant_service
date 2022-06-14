@@ -661,6 +661,130 @@ public class StockValuesControllerTests
         actualObj.Value.Should().BeOfType<List<IndexData>>();
     }
 
+    [Fact]
+    public void AddStockData_ShouldReturnBadRequestForEmptyCollection()
+    {
+        // Arrange
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
+
+        // Act
+        var actual = _controller.AddStockPrice(new List<StockData>());
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("No stocks provided");
+    }
+
+    [Fact]
+    public void AddStockData_ShouldReturnBadRequestForUnknownTicker()
+    {
+        // Arrange
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
+        var data = new List<StockData>
+        {
+            new()
+            {
+                Ticker = "IBM",
+                Date = DateTime.Now.AddDays(-365),
+                Open = 123.321m,
+                High = 124.321m,
+                Low = 122.021m,
+                Close = 124.320m,
+                CloseAdj = 124.0m,
+                Volume = 32425284
+            }
+        };
+
+        data.First().Ticker = "xyz";
+
+        // Act
+        var actual = _controller.AddStockPrice(data);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker 'xyz' is unknown.");
+    }
+
+    [Fact]
+    public void AddStockData_ShouldReturnBadRequestForInvalidModelState()
+    {
+        // Arrange
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
+        _controller.ModelState.AddModelError("Error", "Error occurred");
+
+        // Act
+        var actual = _controller.AddStockPrice(TestData.StockDataDaily.ToList());
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+    }
+
+    [Fact]
+    public void AddStockData_ShouldAddNewDataToTheDatabase()
+    {
+        // Arrange
+        _controller = new StockValuesController(_logger.Object, _mockDbContext!.Object);
+        var data = TestData.StockDataDaily.ToList();
+        data.Add(new StockData
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-361),
+            Open = 124.30m,
+            High = 126.481m,
+            Low = 122.021m,
+            Close = 124.30m,
+            CloseAdj = 123.5m,
+            Volume = 41425284
+        });
+        data.Add(new StockData
+        {
+            Ticker = "IBM",
+            Date = DateTime.Now.AddDays(-360),
+            Open = 124.30m,
+            High = 126.481m,
+            Low = 122.021m,
+            Close = 124.30m,
+            CloseAdj = 123.5m,
+            Volume = 41425284
+        });
+
+        var expected = data.Select(d => new Price
+        {
+            SymbolId = 1,
+            Date = d.Date,
+            Open = d.Open,
+            High = d.High,
+            Low = d.Low,
+            Close = d.Close,
+            CloseAdj = d.CloseAdj,
+            Volume = d.Volume
+        }).ToList();
+
+        // Act
+        var actual = _controller.AddStockPrice(data);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<OkObjectResult>();
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj!.Value.Should().NotBeNull();
+        actualObj!.Value.Should().BeEquivalentTo(expected);
+    }
+
     private static Mock<DbSet<T>> CreateDbSetMock<T>(IEnumerable<T> elements) where T : class
     {
         var elementsAsQueryable = elements.AsQueryable();
