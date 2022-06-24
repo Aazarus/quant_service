@@ -213,6 +213,7 @@ public class StockValuesController : ControllerBase
     /// </summary>
     /// <param name="stocks">The stocks to get data for.</param>
     /// <returns>An IActionResult.</returns>
+    [HttpPost("add-stock-price")]
     public IActionResult AddStockPrice([FromBody] List<StockData> stocks)
     {
         if (!stocks.Any()) return BadRequest("No stocks provided");
