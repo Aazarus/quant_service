@@ -12,10 +12,18 @@ using Services;
 [Route("~/api/YahooStock")]
 public class YahooMarketDataValuesController
 {
+    /// <summary>
+    ///     The Application logger.
+    /// </summary>
     private readonly ILogger<YahooMarketDataValuesController> _logger;
+
+    /// <summary>
+    ///     The Yahoo Service.
+    /// </summary>
     private readonly IYahooService _yahooService;
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="YahooMarketDataValuesController" /> class.
     /// </summary>
     /// <param name="logger"></param>
     /// <param name="yahooService"></param>
