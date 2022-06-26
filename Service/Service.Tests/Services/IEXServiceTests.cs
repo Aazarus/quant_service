@@ -117,7 +117,7 @@ public class IEXServiceTests
                     It.IsAny<ChartRange>(),
                     It.IsAny<bool>(),
                     It.IsAny<bool>()))
-            .ReturnsAsync(await Task.FromResult(GetHistoricalPrice()));
+            .ReturnsAsync(await Task.FromResult(TestData.IEXResponse));
 
         var expected = TestData.StockDataDaily.ToList();
 
@@ -143,51 +143,5 @@ public class IEXServiceTests
             It.Is<It.IsAnyType>((@object, type) => true),
             It.IsAny<Exception>(),
             It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Never);
-    }
-
-    private static IEXResponse<IEnumerable<HistoricalPriceResponse>> GetHistoricalPrice()
-    {
-        return new IEXResponse<IEnumerable<HistoricalPriceResponse>>
-        {
-            Data = new List<HistoricalPriceResponse>
-            {
-                new()
-                {
-                    date = DateTime.Now.AddDays(-365).ToShortDateString(),
-                    open = 123.321m,
-                    high = 124.321m,
-                    low = 122.021m,
-                    close = 124.320m,
-                    volume = 32425284
-                },
-                new()
-                {
-                    date = DateTime.Now.AddDays(-364).ToShortDateString(),
-                    open = 124.320m,
-                    high = 125.81m,
-                    low = 122.021m,
-                    close = 125.30m,
-                    volume = 32443284
-                },
-                new()
-                {
-                    date = DateTime.Now.AddDays(-363).ToShortDateString(),
-                    open = 125.30m,
-                    high = 125.481m,
-                    low = 123.021m,
-                    close = 124.30m,
-                    volume = 31425284
-                },
-                new()
-                {
-                    date = DateTime.Now.AddDays(-362).ToShortDateString(),
-                    open = 124.30m,
-                    high = 126.481m,
-                    low = 122.021m,
-                    close = 124.30m,
-                    volume = 41425284
-                }
-            }
-        };
     }
 }
