@@ -6,6 +6,8 @@ namespace Service.Tests.Data;
 
 using System;
 using System.Collections.Generic;
+using IEXSharp.Model;
+using IEXSharp.Model.CoreData.StockPrices.Response;
 using Models;
 using NodaTime;
 using YahooQuotesApi;
@@ -214,6 +216,49 @@ public class TestData
             Close = 124.30m,
             CloseAdj = 123.5m,
             Volume = 41425284
+        }
+    };
+
+    public static IEXResponse<IEnumerable<HistoricalPriceResponse>> IEXResponse = new()
+    {
+        Data = new List<HistoricalPriceResponse>
+        {
+            new()
+            {
+                date = DateTime.Now.AddDays(-365).ToShortDateString(),
+                open = 123.321m,
+                high = 124.321m,
+                low = 122.021m,
+                close = 124.320m,
+                volume = 32425284
+            },
+            new()
+            {
+                date = DateTime.Now.AddDays(-364).ToShortDateString(),
+                open = 124.320m,
+                high = 125.81m,
+                low = 122.021m,
+                close = 125.30m,
+                volume = 32443284
+            },
+            new()
+            {
+                date = DateTime.Now.AddDays(-363).ToShortDateString(),
+                open = 125.30m,
+                high = 125.481m,
+                low = 123.021m,
+                close = 124.30m,
+                volume = 31425284
+            },
+            new()
+            {
+                date = DateTime.Now.AddDays(-362).ToShortDateString(),
+                open = 124.30m,
+                high = 126.481m,
+                low = 122.021m,
+                close = 124.30m,
+                volume = 41425284
+            }
         }
     };
 }
