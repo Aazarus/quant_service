@@ -13,8 +13,8 @@ public interface IIEXService
     ///     Gets the IEX Stock data for a given ticker within the provided range.
     /// </summary>
     /// <param name="ticker">The Stock Ticker.</param>
-    /// <param name="range">The data range.</param>
-    /// <returns>A collection of stock data.</returns>
+    /// <param name="range">The Date Range.</param>
+    /// <returns>A collection of StockData.</returns>
     Task<List<StockData>> GetStock(string ticker,
         ChartRange range);
 }
