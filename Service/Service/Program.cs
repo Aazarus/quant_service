@@ -17,6 +17,17 @@ builder.Services.AddDbContext<QuantDataContext>(options =>
 
 builder.Services.AddSingleton<IYahooQuotesApiWrapper, YahooQuotesApiWrapper>();
 builder.Services.AddSingleton<IYahooService, YahooService>();
+builder.Services.AddSingleton<IIEXService, IEXService>();
+builder.Services.AddSingleton<IIEXApiWrapper, IEXApiWrapper>();
+
+// API Keys
+builder.Services.AddSingleton(
+    new ApiKeySettings.IEX
+    {
+        PublishableToken = builder.Configuration.GetSection("ApiKeys:IEX:PublishableToken").Value!,
+        SecurityToken = builder.Configuration.GetSection("ApiKeys:IEX:SecurityToken").Value!
+    }
+);
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
