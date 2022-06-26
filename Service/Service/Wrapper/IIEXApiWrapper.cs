@@ -11,6 +11,7 @@ using IEXSharp.Model.CoreData.StockPrices.Response;
 public interface IIEXApiWrapper
 {
     /// <summary>
+    ///     Gets Price data for a given ticker from IEX.
     /// </summary>
     /// <param name="pubToken">The Publishable Token for IEX API.</param>
     /// <param name="secToken">The Security Token for IEX API.</param>
