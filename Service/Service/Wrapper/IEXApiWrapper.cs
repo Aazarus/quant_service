@@ -9,6 +9,7 @@ using IEXSharp;
 using IEXSharp.Model;
 using IEXSharp.Model.CoreData.StockPrices.Request;
 using IEXSharp.Model.CoreData.StockPrices.Response;
+using IEXSharp.Model.Shared.Response;
 
 [ExcludeFromCodeCoverage]
 public class IEXApiWrapper : IIEXApiWrapper
@@ -20,5 +21,13 @@ public class IEXApiWrapper : IIEXApiWrapper
     {
         using var iexCloudClient = new IEXCloudClient(pubToken, secToken, false, false);
         return await iexCloudClient.StockPrices.HistoricalPriceAsync(ticker, range);
+    }
+
+    /// <inheritdoc />
+    public async Task<IEXResponse<Quote>> GetRealTimeStockQuote(string pubToken,
+        string secToken, string ticker)
+    {
+        using var iexCloudClient = new IEXCloudClient(pubToken, secToken, false, false);
+        return await iexCloudClient.StockPrices.QuoteAsync(ticker);
     }
 }
