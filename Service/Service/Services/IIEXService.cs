@@ -6,6 +6,7 @@ namespace Service.Services;
 
 using IEXSharp.Model.CoreData.StockPrices.Request;
 using Models;
+using Models.IEX;
 
 public interface IIEXService
 {
@@ -17,4 +18,11 @@ public interface IIEXService
     /// <returns>A collection of StockData.</returns>
     Task<List<StockData>> GetStock(string ticker,
         ChartRange range);
+
+    /// <summary>
+    ///     Gets the Real-Time quote for a given ticker.
+    /// </summary>
+    /// <param name="ticker">The Ticker.</param>
+    /// <returns>An IexStockQuote.</returns>
+    Task<IexStockQuote> GetQuote(string ticker);
 }
