@@ -8,7 +8,9 @@ using System;
 using System.Collections.Generic;
 using IEXSharp.Model;
 using IEXSharp.Model.CoreData.StockPrices.Response;
+using IEXSharp.Model.Shared.Response;
 using Models;
+using Models.IEX;
 using NodaTime;
 using YahooQuotesApi;
 using Symbol = Models.Symbol;
@@ -261,4 +263,108 @@ public class TestData
             }
         }
     };
+
+    public static IEXResponse<Quote> IEXQuote = new()
+    {
+        // This is taken directly from the API request and may be updated in the future
+        Data = new Quote
+        {
+            symbol = "IBM",
+            companyName = "International Business Machines Corp.",
+            primaryExchange = "NEW YORK STOCK EXCHANGE INC.",
+            calculationPrice = "close",
+            open = null,
+            openTime = null,
+            openSource = "official",
+            close = null,
+            closeTime = null,
+            closeSource = "official",
+            high = null,
+            highTime = 1657569599993,
+            highSource = "15 minute delayed price",
+            low = null,
+            lowTime = 1657549289791,
+            lowSource = "IEX real time price",
+            latestPrice = 141M,
+            latestSource = "Close",
+            latestTime = "July 11, 2022",
+            latestUpdate = 1657569602157,
+            latestVolume = null,
+            iexRealtimePrice = 140.99M,
+            iexRealtimeSize = 100,
+            iexLastUpdated = 1657569596227,
+            delayedPrice = null,
+            delayedPriceTime = 1657569599993,
+            oddLotDelayedPrice = null,
+            oddLotDelayedPriceTime = 1657569599993,
+            extendedPrice = null,
+            extendedChange = null,
+            extendedChangePercent = null,
+            extendedPriceTime = null,
+            previousClose = 140.47M,
+            previousVolume = 2820928M,
+            change = 0.53M,
+            changePercent = 0.00377M,
+            volume = null,
+            iexMarketPercent = 0.04435251961671668M,
+            iexVolume = 173127,
+            avgTotalVolume = 5292188,
+            iexBidPrice = 0,
+            iexBidSize = 0,
+            iexAskPrice = 0,
+            iexAskSize = 0,
+            iexOpen = 140.78M,
+            iexOpenTime = 1657546201086M,
+            iexClose = 140.99M,
+            iexCloseTime = 1657569596227,
+            marketCap = 126820380825,
+            peRatio = 22.89M,
+            week52High = 144.73M,
+            week52Low = 111.84M,
+            ytdChange = 0.0802814805155791M,
+            lastTradeTime = 1657569599993,
+            isUSMarketOpen = false,
+            sector = null
+        }
+    };
+
+    public static IexStockQuote StockQuote = new()
+    {
+        Ticker = IEXQuote.Data.symbol,
+        Open = IEXQuote.Data.iexOpen ?? 0,
+        OpenTime = FromUnixTime(IEXQuote.Data.iexOpenTime),
+        Close = IEXQuote.Data.iexClose ?? 0,
+        CloseTime = FromUnixTime(IEXQuote.Data.iexCloseTime),
+        LatestPrice = IEXQuote.Data.latestPrice ?? 0,
+        LatestTime = DateTime.Parse(IEXQuote.Data.latestTime),
+        LatestUpdateTime = FromUnixTime(IEXQuote.Data.latestUpdate),
+        LatestVolume = IEXQuote.Data.latestVolume ?? 0,
+        DelayedPrice = IEXQuote.Data.delayedPrice ?? 0,
+        DelayedPriceTime = FromUnixTime(IEXQuote.Data.delayedPriceTime),
+        PreviousClose = IEXQuote.Data.previousClose ?? 0,
+        IexRealTimePrice = IEXQuote.Data.iexRealtimePrice ?? 0,
+        IexRealTimeSize = IEXQuote.Data.iexRealtimeSize ?? 0,
+        IexLastUpdated = FromUnixTime(IEXQuote.Data.iexLastUpdated),
+        IexBidPrice = IEXQuote.Data.iexBidPrice ?? 0,
+        IexBidSize = IEXQuote.Data.iexBidSize ?? 0,
+        IexAskPrice = IEXQuote.Data.iexAskPrice ?? 0,
+        IexAskSize = IEXQuote.Data.iexAskSize ?? 0,
+        Change = decimal.ToDouble(IEXQuote.Data.change ?? 0),
+        ChangePercent = decimal.ToDouble(IEXQuote.Data.changePercent ?? 0),
+        MarketCap = IEXQuote.Data.marketCap ?? 0,
+        PeRatio = decimal.ToDouble(IEXQuote.Data.peRatio ?? 0),
+        Week52High = IEXQuote.Data.week52High ?? 0,
+        Week52Low = IEXQuote.Data.week52Low ?? 0,
+        YtdChange = decimal.ToDouble(IEXQuote.Data.ytdChange ?? 0)
+    };
+
+    // This is a copy of IEXService method. Possibly worth reusing that version.
+    private static DateTime FromUnixTime(decimal? uTime)
+    {
+        if (!uTime.HasValue) throw new ArgumentNullException(nameof(uTime));
+
+        long milliseconds = long.Parse(uTime.ToString());
+        return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
+            .DateTime.ToLocalTime();
+    }
 }
