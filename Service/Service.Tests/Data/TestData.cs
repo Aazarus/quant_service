@@ -6,6 +6,7 @@ namespace Service.Tests.Data;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using IEXSharp.Model;
 using IEXSharp.Model.CoreData.StockPrices.Response;
 using IEXSharp.Model.Shared.Response;
@@ -328,6 +329,70 @@ public class TestData
         }
     };
 
+    public static IEXResponse<Quote> IEXQuoteException = new()
+    {
+        // This is taken directly from the API request and may be updated in the future
+        Data = new Quote
+        {
+            symbol = "IBM",
+            companyName = "International Business Machines Corp.",
+            primaryExchange = "NEW YORK STOCK EXCHANGE INC.",
+            calculationPrice = "close",
+            open = null,
+            openTime = null,
+            openSource = "official",
+            close = null,
+            closeTime = null,
+            closeSource = "official",
+            high = null,
+            highTime = 1657569599993,
+            highSource = "15 minute delayed price",
+            low = null,
+            lowTime = 1657549289791,
+            lowSource = "IEX real time price",
+            latestPrice = 141M,
+            latestSource = "Close",
+            latestTime = "July 11, 2022",
+            latestUpdate = 1657569602157,
+            latestVolume = null,
+            iexRealtimePrice = 140.99M,
+            iexRealtimeSize = 100,
+            iexLastUpdated = null,
+            delayedPrice = null,
+            delayedPriceTime = null,
+            oddLotDelayedPrice = null,
+            oddLotDelayedPriceTime = null,
+            extendedPrice = null,
+            extendedChange = null,
+            extendedChangePercent = null,
+            extendedPriceTime = null,
+            previousClose = 140.47M,
+            previousVolume = 2820928M,
+            change = 0.53M,
+            changePercent = 0.00377M,
+            volume = null,
+            iexMarketPercent = 0.04435251961671668M,
+            iexVolume = 173127,
+            avgTotalVolume = 5292188,
+            iexBidPrice = 0,
+            iexBidSize = 0,
+            iexAskPrice = 0,
+            iexAskSize = 0,
+            iexOpen = 140.78M,
+            iexOpenTime = 1657546201086M,
+            iexClose = 140.99M,
+            iexCloseTime = 1657569596227,
+            marketCap = 126820380825,
+            peRatio = 22.89M,
+            week52High = 144.73M,
+            week52Low = 111.84M,
+            ytdChange = 0.0802814805155791M,
+            lastTradeTime = 1657569599993,
+            isUSMarketOpen = false,
+            sector = null
+        }
+    };
+
     public static IexStockQuote StockQuote = new()
     {
         Ticker = IEXQuote.Data.symbol,
@@ -359,6 +424,7 @@ public class TestData
     };
 
     // This is a copy of IEXService method. Possibly worth reusing that version.
+    [ExcludeFromCodeCoverage]
     private static DateTime FromUnixTime(decimal? uTime)
     {
         if (!uTime.HasValue) throw new ArgumentNullException(nameof(uTime));
