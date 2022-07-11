@@ -8,7 +8,7 @@ using IEXSharp.Model.CoreData.StockPrices.Request;
 using Microsoft.AspNetCore.Mvc;
 using Services;
 
-[Route("api/IexStock")]
+[Route("api")]
 public class IEXMarketDataValuesController : ControllerBase
 {
     /// <summary>
@@ -40,7 +40,7 @@ public class IEXMarketDataValuesController : ControllerBase
     /// <param name="ticker">The Stock Ticker.</param>
     /// <param name="range">The data range.</param>
     /// <returns>An IActionResult.</returns>
-    [Route("{ticker}/{range}")]
+    [Route("IexStock/{ticker}/{range}")]
     [HttpGet]
     public async Task<IActionResult> GetIexStock(
         string ticker,
@@ -55,5 +55,23 @@ public class IEXMarketDataValuesController : ControllerBase
         if (!data.Any()) return NotFound($"No data for Ticker: {ticker}");
 
         return Ok(data);
+    }
+
+    /// <summary>
+    ///     Gets the Real-Time quote for a given ticker.
+    /// </summary>
+    /// <param name="ticker">The Ticker.</param>
+    /// <returns>An IActionResult.</returns>
+    [Route("IexQuote/{ticker}")]
+    [HttpGet]
+    public async Task<IActionResult> GetIexQuote(string ticker)
+    {
+        if (string.IsNullOrWhiteSpace(ticker)) return BadRequest("Ticker is invalid");
+
+        var data = await _iexService.GetQuote(ticker);
+
+        if (data == null) return NotFound($"No data for Ticker: {ticker}");
+
+        return Ok();
     }
 }

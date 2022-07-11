@@ -13,6 +13,7 @@ using IEXSharp.Model.CoreData.StockPrices.Request;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.IEX;
 using Moq;
 using Service.Controllers;
 using Service.Services;
@@ -123,5 +124,43 @@ public class IEXMarketDataValuesControllerTests
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
         actualObj.Value.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task GetIexQuote_ShouldReturnBadRequestForNullTicker()
+    {
+        // Arrange
+        _controller = new IEXMarketDataValuesController(_logger.Object, _iexService.Object);
+
+        // Act
+        var actual = await _controller.GetIexQuote(null!);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetIexQuote_ShouldReturnNotFoundForNullResultFromService()
+    {
+        // Arrange
+        _iexService.Setup(s => s.GetQuote(It.IsAny<string>()))
+            .ReturnsAsync(await Task.FromResult<IexStockQuote>(null!));
+        _controller = new IEXMarketDataValuesController(_logger.Object, _iexService.Object);
+
+        // Act
+        var actual = await _controller.GetIexQuote("IBM");
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be("No data for Ticker: IBM");
     }
 }
