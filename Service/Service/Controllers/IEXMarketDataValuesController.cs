@@ -72,6 +72,6 @@ public class IEXMarketDataValuesController : ControllerBase
 
         if (data == null) return NotFound($"No data for Ticker: {ticker}");
 
-        return Ok();
+        return Ok(data);
     }
 }

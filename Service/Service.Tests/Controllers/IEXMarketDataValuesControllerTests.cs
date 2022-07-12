@@ -163,4 +163,25 @@ public class IEXMarketDataValuesControllerTests
         actualObj!.StatusCode.Should().Be(404);
         actualObj.Value.Should().Be("No data for Ticker: IBM");
     }
+
+    [Fact]
+    public async Task GetIexQuote_ShouldReturnOKWithDataFromService()
+    {
+        // Arrange
+        var expected = TestData.StockQuote;
+        _iexService.Setup(s => s.GetQuote(It.IsAny<string>()))
+            .ReturnsAsync(await Task.FromResult(expected));
+        _controller = new IEXMarketDataValuesController(_logger.Object, _iexService.Object);
+
+        // Act
+        var actual = await _controller.GetIexQuote("IBM");
+
+        // Assert
+        actual.Should().BeOfType(typeof(OkObjectResult));
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().BeEquivalentTo(expected);
+    }
 }
