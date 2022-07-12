@@ -211,6 +211,40 @@ public class IEXServiceTests
     }
 
     [Fact]
+    public async Task GetQuote_ShouldReturnANewIexStockQuoteIfNoDataGivenFromIEX()
+    {
+        // Arrange
+        const string errorMessage = "An Error Occurred.";
+        _apiWrapper.Setup(w =>
+                w.GetRealTimeStockQuote(
+                    It.IsAny<string>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()
+                ))
+            .ReturnsAsync(await Task.FromResult(
+                new IEXResponse<Quote>
+                {
+                    Data = null!
+                }));
+
+        _service = new IEXService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetQuote("IBM");
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new IexStockQuote());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Never);
+    }
+
+    [Fact]
     public async Task GetQuote_ShouldReturnAValidIexStockQuoteForAValidRequest()
     {
         // Arrange
