@@ -130,7 +130,7 @@ public class IEXService : IIEXService
                         PreviousClose = response.Data.previousClose ?? 0,
                         IexRealTimePrice = response.Data.iexRealtimePrice ?? 0,
                         IexRealTimeSize = response.Data.iexRealtimeSize ?? 0,
-                        IexLastUpdated = FromUnixTime(response.Data.iexLastUpdated),
+                        IexLastUpdated = FromUnixTime(response.Data.lastTradeTime),
                         IexBidPrice = response.Data.iexBidPrice ?? 0,
                         IexBidSize = response.Data.iexBidSize ?? 0,
                         IexAskPrice = response.Data.iexAskPrice ?? 0,
