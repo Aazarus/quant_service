@@ -29,6 +29,13 @@ builder.Services.AddSingleton(
     }
 );
 
+builder.Services.AddSingleton(
+    new ApiKeySettings.AlphaVantage
+    {
+        ApiKey = builder.Configuration.GetSection("ApiKeys:AlphaVantage:ApiKey").Value!
+    }
+);
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

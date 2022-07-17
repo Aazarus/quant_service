@@ -24,4 +24,15 @@ public class ApiKeySettings
         /// </summary>
         public string SecurityToken { get; set; } = "";
     }
+
+    /// <summary>
+    ///     Defines the class holding the API Key for AlphaVantage access.
+    /// </summary>
+    public class AlphaVantage
+    {
+        /// <summary>
+        ///     Gets or sets the Api Key for AlphaVantage access.
+        /// </summary>
+        public string ApiKey { get; set; } = "";
+    }
 }
