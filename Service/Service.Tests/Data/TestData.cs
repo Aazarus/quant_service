@@ -409,7 +409,7 @@ public class TestData
         PreviousClose = IEXQuote.Data.previousClose ?? 0,
         IexRealTimePrice = IEXQuote.Data.iexRealtimePrice ?? 0,
         IexRealTimeSize = IEXQuote.Data.iexRealtimeSize ?? 0,
-        IexLastUpdated = FromUnixTime(IEXQuote.Data.iexLastUpdated),
+        IexLastUpdated = FromUnixTime(IEXQuote.Data.lastTradeTime),
         IexBidPrice = IEXQuote.Data.iexBidPrice ?? 0,
         IexBidSize = IEXQuote.Data.iexBidSize ?? 0,
         IexAskPrice = IEXQuote.Data.iexAskPrice ?? 0,
