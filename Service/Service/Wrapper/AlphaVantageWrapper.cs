@@ -4,10 +4,6 @@
 
 namespace Service.Wrapper;
 
-using System.Diagnostics.CodeAnalysis;
-
-[ExcludeFromCodeCoverage]
-// ToDo: Normally don't run tests on the wrappers as they are essentially call 3rd party APIs, however, this could be tested.
 public class AlphaVantageWrapper : IAlphaVantageWrapper
 {
     /// <summary>
@@ -50,10 +46,10 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         {
             history = await client.GetStringAsync(url);
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            _logger.LogError(
-                ex != null ? ex.Message : $"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
+            // ToDo: Log error when adding 3rd party logger.
+            _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
         }
 
         return history;
