@@ -26,12 +26,12 @@ public class IEXServiceTests
 {
     private readonly ApiKeySettings.IEX _apiKey;
     private readonly Mock<IIEXApiWrapper> _apiWrapper;
-    private readonly Mock<ILogger<YahooService>> _logger;
+    private readonly Mock<ILogger<IEXService>> _logger;
     private IEXService? _service;
 
     public IEXServiceTests()
     {
-        _logger = new Mock<ILogger<YahooService>>();
+        _logger = new Mock<ILogger<IEXService>>();
         _apiWrapper = new Mock<IIEXApiWrapper>();
         _apiKey = new ApiKeySettings.IEX
         {

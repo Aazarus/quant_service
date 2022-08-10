@@ -28,7 +28,7 @@ public class IEXService : IIEXService
     /// <summary>
     ///     The Application Logger.
     /// </summary>
-    private readonly ILogger<YahooService> _logger;
+    private readonly ILogger<IEXService> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="IEXService" /> class.
@@ -36,7 +36,7 @@ public class IEXService : IIEXService
     /// <param name="logger">The Application Logger.</param>
     /// <param name="iexKey">The IEX Api Keys.</param>
     /// <param name="apiWrapper">The IEX Api Wrapper.</param>
-    public IEXService(ILogger<YahooService> logger, ApiKeySettings.IEX iexKey, IIEXApiWrapper apiWrapper)
+    public IEXService(ILogger<IEXService> logger, ApiKeySettings.IEX iexKey, IIEXApiWrapper apiWrapper)
     {
         _logger = logger;
         _iexKey = iexKey;
