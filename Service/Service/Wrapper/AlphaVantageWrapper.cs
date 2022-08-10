@@ -79,6 +79,6 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     private static string GenerateUrl(string timeSeries, string ticker, string size, string apiKey)
     {
         return
-            $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apiKey={apiKey}&datatype=csv";
+            $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apikey={apiKey}&datatype=csv";
     }
 }
