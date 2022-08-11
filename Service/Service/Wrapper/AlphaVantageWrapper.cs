@@ -48,7 +48,6 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         }
         catch (Exception)
         {
-            // ToDo: Log error when adding 3rd party logger.
             _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
         }
 
