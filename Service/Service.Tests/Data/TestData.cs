@@ -423,6 +423,85 @@ public class TestData
         YtdChange = decimal.ToDouble(IEXQuote.Data.ytdChange ?? 0)
     };
 
+    public static string AvResponse = @"timestamp,open,high,low,close,adjusted close,volume,dividend amount
+2022-08-11,133.1000,133.3500,129.1200,132.5400,132.5400,14467215,1.6500
+2022-08-05,130.7500,132.8620,130.5100,132.4800,130.8129,17400572,0.0000
+2022-07-29,128.4400,131.0000,127.5800,130.7900,129.1442,22223785,0.0000
+2022-07-22,140.1500,140.3100,125.1300,128.2500,126.6361,66246811,0.0000
+2022-07-15,140.6200,141.8700,135.0200,139.9200,138.1593,21089228,0.0000
+
+2022-07-08,139.9700,141.3250,135.2700,140.4700,138.7023,16229131,0.0000";
+
+    public static IEnumerable<StockData> AvData = new List<StockData>
+    {
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-11"),
+            Open = 133.1M,
+            High = 133.35M,
+            Low = 129.12M,
+            Close = 132.54M,
+            CloseAdj = 132.54M,
+            Volume = 14467215M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-05"),
+            Open = 130.75M,
+            High = 132.862M,
+            Low = 130.51M,
+            Close = 132.48M,
+            CloseAdj = 130.8129M,
+            Volume = 17400572
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-07-29"),
+            Open = 128.44M,
+            High = 131.00M,
+            Low = 127.58M,
+            Close = 130.79M,
+            CloseAdj = 129.1442M,
+            Volume = 22223785
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-07-22"),
+            Open = 140.15M,
+            High = 140.31M,
+            Low = 125.13M,
+            Close = 128.25M,
+            CloseAdj = 126.6361M,
+            Volume = 66246811
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-07-15"),
+            Open = 140.62M,
+            High = 141.87M,
+            Low = 135.02M,
+            Close = 139.92M,
+            CloseAdj = 138.1593M,
+            Volume = 21089228
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-07-08"),
+            Open = 139.97M,
+            High = 141.325M,
+            Low = 135.27M,
+            Close = 140.47M,
+            CloseAdj = 138.7023M,
+            Volume = 16229131
+        }
+    };
+
     // This is a copy of IEXService method. Possibly worth reusing that version.
     [ExcludeFromCodeCoverage]
     private static DateTime FromUnixTime(decimal? uTime)
