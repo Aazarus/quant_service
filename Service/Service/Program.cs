@@ -15,10 +15,14 @@ builder.Services.AddDbContext<QuantDataContext>(options =>
     options.UseSqlServer(builder.Configuration["Data:Quant:ConnectionString"]);
 });
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddSingleton<IYahooQuotesApiWrapper, YahooQuotesApiWrapper>();
 builder.Services.AddSingleton<IYahooService, YahooService>();
 builder.Services.AddSingleton<IIEXService, IEXService>();
 builder.Services.AddSingleton<IIEXApiWrapper, IEXApiWrapper>();
+builder.Services.AddSingleton<IAlphaVantageWrapper, AlphaVantageWrapper>();
+builder.Services.AddSingleton<IAlphaVantageService, AlphaVantageService>();
 
 // API Keys
 builder.Services.AddSingleton(
