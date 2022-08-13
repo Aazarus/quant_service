@@ -41,7 +41,7 @@ public class AlphaVantageWrapperTests
         // Test Size
         if (full) start = DateTime.Today.AddDays(-121).ToLongDateString();
 
-        // Setup factory
+        // Setup HttpMessageHandler
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
@@ -106,6 +106,72 @@ public class AlphaVantageWrapperTests
 
         // Act
         string actual = await _wrapper.GetStockEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().Be(string.Empty);
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Theory]
+    [InlineData("IBM", 1, 99, "api_key")]
+    [InlineData("IBM", 1, 101, "api_key")]
+    public async Task GetStockBar_ShouldReturnTheResultFromAlphaVantage(string ticker, int interval, int outputSize,
+        string apiKey)
+    {
+        // Arrange
+        const string expected = "result from AV";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetStockBar(ticker, interval, outputSize, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(expected);
+    }
+
+    [Fact]
+    public async Task GetStockBar_ShouldThrowExceptionIfRequestFailsWithDefaultMessage()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const int interval = 1;
+        const int outputSize = 50;
+        const string apiKey = "Api Key";
+        const string errorMessage = $"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ThrowsAsync(null);
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetStockBar(ticker, interval, outputSize, apiKey);
 
         // Assert
         actual.Should().Be(string.Empty);

@@ -53,6 +53,27 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return history;
     }
 
+    /// <inheritdoc />
+    public async Task<string> GetStockBar(string ticker, int interval, int outputSize, string apiKey)
+    {
+        string size = GetBarSize(outputSize);
+        const string timeSeries = "TIME_SERIES_INTRADAY";
+        string url =
+            $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputSize={size}&apikey={apiKey}&datatype=csv&interval={interval}min";
+        var history = string.Empty;
+
+        try
+        {
+            history = await _httpClient.GetStringAsync(url);
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
+        }
+
+        return history;
+    }
+
     private static string GetEODSize(DateTime startDate)
     {
         return startDate < DateTime.Today.AddDays(-120) ? "full" : "compact";
@@ -74,5 +95,10 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     {
         return
             $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apikey={apiKey}&datatype=csv";
+    }
+
+    private static string GetBarSize(int outputSize)
+    {
+        return outputSize > 100 ? "full" : "compact";
     }
 }
