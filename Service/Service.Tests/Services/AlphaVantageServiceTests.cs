@@ -42,7 +42,7 @@ public class AlphaVantageServiceTests
         string end = DateTime.Now.ToLongDateString();
         const string period = "weekly";
 
-        _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, end, period))
+        _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, period, _apiKey.ApiKey))
             .ReturnsAsync(await Task.FromResult<string>(null!));
 
         _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
