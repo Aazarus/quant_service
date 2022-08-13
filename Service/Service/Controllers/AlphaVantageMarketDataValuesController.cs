@@ -71,7 +71,6 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
     /// <returns>True if valid else false.</returns>
     private static bool IsDateValid(string date)
     {
-        //ToDo: Continue from here, below should be checking if 'date' is a valid date but the test is passing in 'test date' so obviously not a date
         return DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
             out _);
     }
