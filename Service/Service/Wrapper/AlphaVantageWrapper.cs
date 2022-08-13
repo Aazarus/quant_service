@@ -12,9 +12,9 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     private const string AlphaVantageUrl = "https://www.alphavantage.co/";
 
     /// <summary>
-    ///     The HttpClient Factory.
+    ///     The HttpClient.
     /// </summary>
-    private readonly IHttpClientFactory _clientFactory;
+    private readonly HttpClient _httpClient;
 
     /// <summary>
     ///     The application logger.
@@ -25,11 +25,11 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     ///     Initializes a new instance of the <see cref="AlphaVantageWrapper" /> class.
     /// </summary>
     /// <param name="logger">The Application Logger.</param>
-    /// <param name="clientFactory">The HttpClient Factory.</param>
-    public AlphaVantageWrapper(ILogger<AlphaVantageWrapper> logger, IHttpClientFactory clientFactory)
+    /// <param name="client">The HttpClient.</param>
+    public AlphaVantageWrapper(ILogger<AlphaVantageWrapper> logger, HttpClient client)
     {
         _logger = logger;
-        _clientFactory = clientFactory;
+        _httpClient = client;
     }
 
     /// <inheritdoc />
@@ -40,11 +40,10 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         string timeSeries = GetEODTimeSeries(period);
         string url = GenerateEODUrl(timeSeries, ticker, size, apiKey);
         var history = string.Empty;
-        var client = _clientFactory.CreateClient("AlphaVantage");
 
         try
         {
-            history = await client.GetStringAsync(url);
+            history = await _httpClient.GetStringAsync(url);
         }
         catch (Exception)
         {

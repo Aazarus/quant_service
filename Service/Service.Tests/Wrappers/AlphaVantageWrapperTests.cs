@@ -19,15 +19,12 @@ using Xunit;
 public class AlphaVantageWrapperTests
 {
     private readonly Mock<ILogger<AlphaVantageWrapper>> _logger;
-    private readonly Mock<IHttpClientFactory> _mockFactory;
-    private readonly AlphaVantageWrapper _wrapper;
+    private HttpClient? _httpClient;
+    private AlphaVantageWrapper? _wrapper;
 
     public AlphaVantageWrapperTests()
     {
         _logger = new Mock<ILogger<AlphaVantageWrapper>>();
-        _mockFactory = new Mock<IHttpClientFactory>();
-
-        _wrapper = new AlphaVantageWrapper(_logger.Object, _mockFactory.Object);
     }
 
     [Theory]
@@ -55,8 +52,9 @@ public class AlphaVantageWrapperTests
                 Content = new StringContent(expected)
             });
 
-        var client = new HttpClient(mockHttpMessageHandler.Object);
-        _mockFactory.Setup(_ => _.CreateClient("AlphaVantage")).Returns(client);
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
 
         // Act
         string actual = await _wrapper.GetStockEOD(ticker, start, period, apiKey);
@@ -74,6 +72,9 @@ public class AlphaVantageWrapperTests
         string start = DateTime.Today.ToLongDateString();
         string? period = null!;
         const string apiKey = "api_key";
+
+        _httpClient = new HttpClient(new HttpClientHandler());
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
 
         // Act
         // Assert
@@ -98,8 +99,10 @@ public class AlphaVantageWrapperTests
                 ItExpr.IsAny<CancellationToken>())
             .ThrowsAsync(null);
 
-        var client = new HttpClient(mockHttpMessageHandler.Object);
-        _mockFactory.Setup(_ => _.CreateClient("AlphaVantage")).Returns(client);
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
 
         // Act
         string actual = await _wrapper.GetStockEOD(ticker, start, period, apiKey);
