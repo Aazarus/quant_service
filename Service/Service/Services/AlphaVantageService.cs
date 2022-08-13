@@ -49,17 +49,8 @@ public class AlphaVantageService : IAlphaVantageService
         string end)
     {
         var models = new List<StockData>();
-        if (response != null)
+        if (response != null && ConfirmResponseIsValid(response))
         {
-            if (response.Contains("This is a premium endpoint"))
-                throw new NotSupportedException("Request requires Premium subscription to AlphaVantage.");
-
-            if (response.Contains("parameter apikey is invalid or missing"))
-            {
-                _logger.LogError("Error calling AlphaVantage. API key may be invalid.");
-                throw new Exception("Issue getting data from AlphaVantage");
-            }
-
             response = response.Replace("\r", "");
             string[] rows = response.Split("\n");
 
@@ -96,5 +87,19 @@ public class AlphaVantageService : IAlphaVantageService
         }
 
         return models;
+    }
+
+    private bool ConfirmResponseIsValid(string response)
+    {
+        if (response.Contains("This is a premium endpoint"))
+            throw new NotSupportedException("Request requires Premium subscription to AlphaVantage.");
+
+        if (response.Contains("parameter apikey is invalid or missing"))
+        {
+            _logger.LogError("Error calling AlphaVantage. API key may be invalid.");
+            throw new Exception("Issue getting data from AlphaVantage");
+        }
+
+        return true;
     }
 }
