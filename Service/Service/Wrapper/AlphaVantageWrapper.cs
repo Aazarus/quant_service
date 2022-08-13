@@ -36,9 +36,9 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     public async Task<string> GetStockEOD(string ticker, string start, string period, string apiKey)
     {
         var startDate = DateTime.Parse(start);
-        string size = GetSize(startDate);
-        string timeSeries = GetTimeSeries(period);
-        string url = GenerateUrl(timeSeries, ticker, size, apiKey);
+        string size = GetEODSize(startDate);
+        string timeSeries = GetEODTimeSeries(period);
+        string url = GenerateEODUrl(timeSeries, ticker, size, apiKey);
         var history = string.Empty;
         var client = _clientFactory.CreateClient("AlphaVantage");
 
@@ -54,12 +54,12 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return history;
     }
 
-    private static string GetSize(DateTime startDate)
+    private static string GetEODSize(DateTime startDate)
     {
         return startDate < DateTime.Today.AddDays(-120) ? "full" : "compact";
     }
 
-    private static string GetTimeSeries(string period)
+    private static string GetEODTimeSeries(string period)
     {
         if (period == null) throw new ArgumentNullException(nameof(period));
 
@@ -71,7 +71,7 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         };
     }
 
-    private static string GenerateUrl(string timeSeries, string ticker, string size, string apiKey)
+    private static string GenerateEODUrl(string timeSeries, string ticker, string size, string apiKey)
     {
         return
             $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apikey={apiKey}&datatype=csv";
