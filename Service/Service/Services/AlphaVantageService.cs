@@ -42,10 +42,10 @@ public class AlphaVantageService : IAlphaVantageService
     public async Task<List<StockData>> GetStockEOD(string ticker, string start, string end, string period)
     {
         string response = await _apiWrapper.GetStockEOD(ticker, start, period, _apiKey.ApiKey);
-        return ProcessAVResponseForStockData(ticker, response, start, end).OrderBy(d => d.Date).ToList();
+        return ProcessEODResponseForStockData(ticker, response, start, end).OrderBy(d => d.Date).ToList();
     }
 
-    private IEnumerable<StockData> ProcessAVResponseForStockData(string ticker, string response, string start,
+    private IEnumerable<StockData> ProcessEODResponseForStockData(string ticker, string response, string start,
         string end)
     {
         var models = new List<StockData>();
