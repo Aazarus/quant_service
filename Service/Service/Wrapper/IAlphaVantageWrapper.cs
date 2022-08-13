@@ -15,4 +15,14 @@ public interface IAlphaVantageWrapper
     /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
     /// <returns>A string containing EOD data.</returns>
     Task<string> GetStockEOD(string ticker, string start, string period, string apiKey);
+
+    /// <summary>
+    ///     Gets the historical (1-2 months) intraday stock bar date for a ticker.
+    /// </summary>
+    /// <param name="ticker">The ticker.</param>
+    /// <param name="interval">The time interval.</param>
+    /// <param name="outputSize">Number of data points.</param>
+    /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
+    /// <returns>A string containing Stock Bar data.</returns>
+    Task<string> GetStockBar(string ticker, int interval, int outputSize, string apiKey);
 }
