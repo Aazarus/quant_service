@@ -4,6 +4,9 @@
 
 namespace Service.Models.AlphaVantage;
 
+using System.Diagnostics.CodeAnalysis;
+
+[ExcludeFromCodeCoverage]
 public class AvStockQuote
 {
     public string? Ticker { get; set; }
