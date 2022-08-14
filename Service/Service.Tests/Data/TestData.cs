@@ -573,6 +573,10 @@ public class TestData
         }
     };
 
+    public static string AvQuoteResponse =
+        @"symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent
+IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.1091%";
+
     // This is a copy of IEXService method. Possibly worth reusing that version.
     [ExcludeFromCodeCoverage]
     private static DateTime FromUnixTime(decimal? uTime)
