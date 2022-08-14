@@ -45,6 +45,12 @@ public class AlphaVantageService : IAlphaVantageService
         return ProcessEODResponseForStockData(ticker, response, start, end).OrderBy(d => d.Date).ToList();
     }
 
+    public async Task<List<StockData>> GetStockBar(string ticker, int interval, int outputSize)
+    {
+        string response = await _apiWrapper.GetStockBar(ticker, interval, outputSize, _apiKey.ApiKey);
+        return ProcessBarResponseForStockData(ticker, response).OrderBy(d => d.Date).ToList();
+    }
+
     private IEnumerable<StockData> ProcessEODResponseForStockData(string ticker, string response, string start,
         string end)
     {
@@ -80,8 +86,43 @@ public class AlphaVantageService : IAlphaVantageService
                 }
                 catch (Exception ex)
                 {
-                    // ToDo: Log exception
-                    Console.WriteLine(ex.Message);
+                    _logger.LogError(ex.Message);
+                }
+            }
+        }
+
+        return models;
+    }
+
+    private IEnumerable<StockData> ProcessBarResponseForStockData(string ticker, string response)
+    {
+        var models = new List<StockData>();
+        if (response != null && ConfirmResponseIsValid(response))
+        {
+            response = response.Replace("\r", "");
+            string[] rows = response.Split("\n");
+
+            foreach (string row in rows.Skip(1))
+            {
+                string[] r = row.Split(",");
+
+                try
+                {
+                    var date = DateTime.Parse(r[0]);
+                    models.Add(new StockData
+                    {
+                        Ticker = ticker,
+                        Date = date,
+                        Open = decimal.Parse(r[1]),
+                        High = decimal.Parse(r[2]),
+                        Low = decimal.Parse(r[3]),
+                        Close = decimal.Parse(r[4]),
+                        Volume = decimal.Parse(r[5])
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
                 }
             }
         }
