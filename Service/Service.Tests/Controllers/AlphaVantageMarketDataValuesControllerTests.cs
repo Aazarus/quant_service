@@ -340,7 +340,6 @@ public class AlphaVantageMarketDataValuesControllerTests
         actualObj.Value.Should().Be($"No data for Ticker: {ticker}");
     }
 
-
     [Fact]
     public async Task GetAvStockEod_ShouldReturnOkWithCollectionForValidRequest()
     {
@@ -362,5 +361,141 @@ public class AlphaVantageMarketDataValuesControllerTests
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
         actualObj.Value.Should().BeEquivalentTo(TestData.AvEODData.ToList());
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnBadRequestForNullTicker()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvStockBar(null!, 1, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnBadRequestForEmptyTicker()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvStockBar(string.Empty, 1, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnBadRequestForWhitespaceTicker()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvStockBar(" ", 1, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnBadRequestForInvalidInterval()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvStockBar("IBM", 0, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("interval is invalid. Must be greater than 0.");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnBadRequestForInvalidOutputSize()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvStockBar("IBM", 1, 0);
+
+        // Assert
+        actual.Should().BeOfType(typeof(BadRequestObjectResult));
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("outputSize is invalid. Must be greater than 0.");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnNotFoundForUnknownTicker()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetStockBar(It.IsAny<string>(), It.IsAny<int>(), It.IsAny<int>()))
+            .ReturnsAsync(new List<StockData>());
+
+        // Act
+        var actual = await _controller.GetAvStockBar("IBM", 1, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be($"No data for Ticker: {ticker}");
+    }
+
+    [Fact]
+    public async Task GetAvStockBar_ShouldReturnOkWithCollectionForValidRequest()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetStockBar(ticker, It.IsAny<int>(), It.IsAny<int>()))
+            .ReturnsAsync(TestData.AvBarData.ToList());
+
+        // Act
+        var actual = await _controller.GetAvStockBar(ticker, 1, 1);
+
+        // Assert
+        actual.Should().BeOfType(typeof(OkObjectResult));
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj.Value.Should().BeEquivalentTo(TestData.AvBarData.ToList());
     }
 }

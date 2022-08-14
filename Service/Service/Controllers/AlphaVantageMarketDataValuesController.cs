@@ -64,6 +64,21 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
+    [Route("IexStock/{ticker}/{interval:int}/{outputSize:int}")]
+    [HttpGet]
+    public async Task<IActionResult> GetAvStockBar(string ticker, int interval, int outputSize)
+    {
+        if (string.IsNullOrWhiteSpace(ticker)) return BadRequest("Ticker is invalid");
+        if (interval < 1) return BadRequest("interval is invalid. Must be greater than 0.");
+        if (outputSize < 1) return BadRequest("outputSize is invalid. Must be greater than 0.");
+
+        var data = await _avService.GetStockBar(ticker, interval, outputSize);
+
+        if (!data.Any()) return NotFound($"No data for Ticker: {ticker}");
+
+        return Ok(data);
+    }
+
     /// <summary>
     ///     Checks if a string is a valid yyy-MM-dd date.
     /// </summary>
