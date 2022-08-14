@@ -82,8 +82,9 @@ public class AlphaVantageWrapperTests
             await _wrapper.GetStockEOD(ticker, start, period, apiKey));
     }
 
+    // This test will cover throwing the exception for all methods as they will use the same private method to make the call and throw if necessary
     [Fact]
-    public async Task GetStockEOD_ShouldThrowExceptionIfRequestFailsWithDefaultMessage()
+    public async Task AnyCallToAlphaVantage_ShouldThrowExceptionIfRequestFailsWithDefaultMessage()
     {
         // Arrange
         const string ticker = "IBM";
@@ -181,5 +182,36 @@ public class AlphaVantageWrapperTests
             It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
             It.IsAny<Exception>(),
             It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldReturnTheStringFromAlphaVantage()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "IBM";
+        const string apiKey = "Api Key";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.IsAny<HttpRequestMessage>(),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetStockQuote(ticker, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
     }
 }

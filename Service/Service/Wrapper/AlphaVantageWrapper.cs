@@ -39,18 +39,8 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         string size = GetEODSize(startDate);
         string timeSeries = GetEODTimeSeries(period);
         string url = GenerateEODUrl(timeSeries, ticker, size, apiKey);
-        var history = string.Empty;
 
-        try
-        {
-            history = await _httpClient.GetStringAsync(url);
-        }
-        catch (Exception)
-        {
-            _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
-        }
-
-        return history;
+        return await CallAlphaVantage(ticker, url);
     }
 
     /// <inheritdoc />
@@ -60,18 +50,17 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         const string timeSeries = "TIME_SERIES_INTRADAY";
         string url =
             $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputSize={size}&apikey={apiKey}&datatype=csv&interval={interval}min";
-        var history = string.Empty;
 
-        try
-        {
-            history = await _httpClient.GetStringAsync(url);
-        }
-        catch (Exception)
-        {
-            _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
-        }
+        return await CallAlphaVantage(ticker, url);
+    }
 
-        return history;
+    /// <inheritdoc />
+    public async Task<string> GetStockQuote(string ticker, string apiKey)
+    {
+        const string function = "GLOBAL_QUOTE";
+        string url = $"{AlphaVantageUrl}query?function={function}&symbol={ticker}&apikey={apiKey}&datatype=csv";
+
+        return await CallAlphaVantage(ticker, url);
     }
 
     private static string GetEODSize(DateTime startDate)
@@ -100,5 +89,20 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     private static string GetBarSize(int outputSize)
     {
         return outputSize > 100 ? "full" : "compact";
+    }
+
+    private async Task<string> CallAlphaVantage(string ticker, string url)
+    {
+        var history = string.Empty;
+        try
+        {
+            history = await _httpClient.GetStringAsync(url);
+        }
+        catch (Exception)
+        {
+            _logger.LogError($"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.");
+        }
+
+        return history;
     }
 }
