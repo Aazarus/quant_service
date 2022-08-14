@@ -45,6 +45,7 @@ public class AlphaVantageService : IAlphaVantageService
         return ProcessEODResponseForStockData(ticker, response, start, end).OrderBy(d => d.Date).ToList();
     }
 
+    /// <inheritdoc />
     public async Task<List<StockData>> GetStockBar(string ticker, int interval, int outputSize)
     {
         string response = await _apiWrapper.GetStockBar(ticker, interval, outputSize, _apiKey.ApiKey);

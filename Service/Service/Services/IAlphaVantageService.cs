@@ -17,4 +17,13 @@ public interface IAlphaVantageService
     /// <param name="period">The period.</param>
     /// <returns>List of StockData.</returns>
     Task<List<StockData>> GetStockEOD(string ticker, string start, string end, string period);
+
+    /// <summary>
+    ///     Get the Bar data for a given ticker with a set interval (time period) and output size.
+    /// </summary>
+    /// <param name="ticker">The Stock Ticker.</param>
+    /// <param name="interval">The time interval.</param>
+    /// <param name="outputSize">The output size.</param>
+    /// <returns>List of StockData.</returns>
+    Task<List<StockData>> GetStockBar(string ticker, int interval, int outputSize);
 }
