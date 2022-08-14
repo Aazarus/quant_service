@@ -350,7 +350,7 @@ public class AlphaVantageMarketDataValuesControllerTests
 
         _avService.Setup(s =>
                 s.GetStockEOD(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()))
-            .ReturnsAsync(TestData.AvData.ToList());
+            .ReturnsAsync(TestData.AvEODData.ToList());
 
         // Act
         var actual = await _controller.GetAvStockEod(ticker, "2022-02-02", "2022-02-01", "weekly");
@@ -361,6 +361,6 @@ public class AlphaVantageMarketDataValuesControllerTests
         var actualObj = actual as OkObjectResult;
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
-        actualObj.Value.Should().BeEquivalentTo(TestData.AvData.ToList());
+        actualObj.Value.Should().BeEquivalentTo(TestData.AvEODData.ToList());
     }
 }

@@ -113,7 +113,7 @@ public class AlphaVantageServiceTests
         const string period = "weekly";
 
         _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, period, _apiKey.ApiKey))
-            .ReturnsAsync(TestData.AvResponse);
+            .ReturnsAsync(TestData.AvEODResponse);
 
         _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
 
@@ -122,7 +122,7 @@ public class AlphaVantageServiceTests
 
         // Assert
         actual.Should().NotBeNull();
-        actual.Should().BeEquivalentTo(TestData.AvData);
+        actual.Should().BeEquivalentTo(TestData.AvEODData);
     }
 
     [Fact]

@@ -423,7 +423,7 @@ public class TestData
         YtdChange = decimal.ToDouble(IEXQuote.Data.ytdChange ?? 0)
     };
 
-    public static string AvResponse = @"timestamp,open,high,low,close,adjusted close,volume,dividend amount
+    public static string AvEODResponse = @"timestamp,open,high,low,close,adjusted close,volume,dividend amount
 2022-08-11,133.1000,133.3500,129.1200,132.5400,132.5400,14467215,1.6500
 2022-08-05,130.7500,132.8620,130.5100,132.4800,130.8129,17400572,0.0000
 2022-07-29,128.4400,131.0000,127.5800,130.7900,129.1442,22223785,0.0000
@@ -431,7 +431,7 @@ public class TestData
 2022-07-15,140.6200,141.8700,135.0200,139.9200,138.1593,21089228,0.0000
 2022-07-08,139.9700,141.3250,135.2700,140.4700,138.7023,16229131,0.0000";
 
-    public static IEnumerable<StockData> AvData = new List<StockData>
+    public static IEnumerable<StockData> AvEODData = new List<StockData>
     {
         new()
         {
