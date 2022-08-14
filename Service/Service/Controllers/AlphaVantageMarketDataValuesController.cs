@@ -42,7 +42,7 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
     /// <param name="end">The end date.</param>
     /// <param name="period">The data period range.</param>
     /// <returns>An IActionResult.</returns>
-    [Route("IexStock/{ticker}/{start}/{end}/{period}")]
+    [Route("AVEod/{ticker}/{start}/{end}/{period}")]
     [HttpGet]
     public async Task<IActionResult> GetAvStockEod(
         string ticker,
@@ -64,7 +64,7 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
-    [Route("IexStock/{ticker}/{interval:int}/{outputSize:int}")]
+    [Route("AVBar/{ticker}/{interval:int}/{outputSize:int}")]
     [HttpGet]
     public async Task<IActionResult> GetAvStockBar(string ticker, int interval, int outputSize)
     {
