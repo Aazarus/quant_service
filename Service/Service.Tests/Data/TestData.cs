@@ -429,7 +429,6 @@ public class TestData
 2022-07-29,128.4400,131.0000,127.5800,130.7900,129.1442,22223785,0.0000
 2022-07-22,140.1500,140.3100,125.1300,128.2500,126.6361,66246811,0.0000
 2022-07-15,140.6200,141.8700,135.0200,139.9200,138.1593,21089228,0.0000
-
 2022-07-08,139.9700,141.3250,135.2700,140.4700,138.7023,16229131,0.0000";
 
     public static IEnumerable<StockData> AvData = new List<StockData>
@@ -499,6 +498,78 @@ public class TestData
             Close = 140.47M,
             CloseAdj = 138.7023M,
             Volume = 16229131
+        }
+    };
+
+    public static string AvBarResponse = @"timestamp,open,high,low,close,volume
+2022-08-12 18:00:00,133.8800,134.0000,133.8800,134.0000,1303
+2022-08-12 17:00:00,134.0100,134.0998,133.9700,134.0000,67834
+2022-08-12 16:00:00,133.6100,134.0900,133.5800,134.0000,581400
+2022-08-12 15:00:00,133.6200,133.7800,133.5650,133.6200,255033
+2022-08-12 14:00:00,133.4300,133.6500,133.4200,133.6100,194805
+2022-08-12 13:00:00,133.2600,133.5200,133.2450,133.4300,244128";
+
+    public static IEnumerable<StockData> AvBarData = new List<StockData>
+    {
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 18:00:00"),
+            Open = 133.88M,
+            High = 134.00M,
+            Low = 133.88M,
+            Close = 134.00M,
+            Volume = 1303M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 17:00:00"),
+            Open = 134.01M,
+            High = 134.0998M,
+            Low = 133.97M,
+            Close = 134.00M,
+            Volume = 67834M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 16:00:00"),
+            Open = 133.61M,
+            High = 134.09M,
+            Low = 133.58M,
+            Close = 134.00M,
+            Volume = 581400M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 15:00:00"),
+            Open = 133.6200M,
+            High = 133.78M,
+            Low = 133.565M,
+            Close = 133.62M,
+            Volume = 255033M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 14:00:00"),
+            Open = 133.43M,
+            High = 133.65M,
+            Low = 133.42M,
+            Close = 133.61M,
+            Volume = 194805M
+        },
+        new()
+        {
+            Ticker = "IBM",
+            Date = DateTime.Parse("2022-08-12 13:00:00"),
+            Open = 133.26M,
+            High = 133.52M,
+            Low = 133.245M,
+            Close = 133.43M,
+            Volume = 244128M
         }
     };
 
