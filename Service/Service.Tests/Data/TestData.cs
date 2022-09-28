@@ -11,6 +11,7 @@ using IEXSharp.Model;
 using IEXSharp.Model.CoreData.StockPrices.Response;
 using IEXSharp.Model.Shared.Response;
 using Models;
+using Models.AlphaVantage;
 using Models.IEX;
 using NodaTime;
 using YahooQuotesApi;
@@ -576,6 +577,20 @@ public class TestData
     public static string AvQuoteResponse =
         @"symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent
 IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.1091%";
+
+    public static AvStockQuote AvStockQuote = new()
+    {
+        Ticker = "IBM",
+        TimeStamp = DateTime.Now,
+        Open = 132.6200m,
+        High = 134.0900m,
+        Low = 131.9800m,
+        Price = 134.0100m,
+        Volume = 2767054m,
+        PrevClose = 132.5400m,
+        Change = 1.4700m,
+        ChangePercent = 0.011091m
+    };
 
     // This is a copy of IEXService method. Possibly worth reusing that version.
     [ExcludeFromCodeCoverage]
