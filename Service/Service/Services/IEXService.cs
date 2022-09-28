@@ -156,9 +156,7 @@ public class IEXService : IIEXService
     /// <returns>A DateTime.</returns>
     private static DateTime FromUnixTime(decimal? uTime)
     {
-        if (!uTime.HasValue) throw new ArgumentNullException(nameof(uTime));
-
-        long milliseconds = long.Parse(uTime.ToString());
+        long milliseconds = long.Parse(uTime.ToString() ?? throw new ArgumentNullException(nameof(uTime)));
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
             .DateTime.ToLocalTime();
     }

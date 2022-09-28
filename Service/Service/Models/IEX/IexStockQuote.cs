@@ -9,7 +9,7 @@ using System.Diagnostics.CodeAnalysis;
 [ExcludeFromCodeCoverage]
 public class IexStockQuote
 {
-    public string Ticker { get; set; }
+    public string? Ticker { get; set; }
     public decimal Open { get; set; }
     public DateTime OpenTime { get; set; }
     public decimal Close { get; set; }

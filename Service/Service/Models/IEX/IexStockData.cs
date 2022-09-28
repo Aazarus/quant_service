@@ -12,7 +12,7 @@ public class IexStockData
     /// <summary>
     ///     Gets or sets the Ticker.
     /// </summary>
-    public string Ticker { get; set; }
+    public string? Ticker { get; set; }
 
     /// <summary>
     ///     Gets or sets the Open price

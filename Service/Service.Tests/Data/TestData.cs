@@ -581,9 +581,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
     [ExcludeFromCodeCoverage]
     private static DateTime FromUnixTime(decimal? uTime)
     {
-        if (!uTime.HasValue) throw new ArgumentNullException(nameof(uTime));
-
-        long milliseconds = long.Parse(uTime.ToString());
+        long milliseconds = long.Parse(uTime.ToString() ?? throw new ArgumentNullException(nameof(uTime)));
         return DateTimeOffset.FromUnixTimeMilliseconds(milliseconds)
             .DateTime.ToLocalTime();
     }
