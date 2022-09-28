@@ -56,7 +56,7 @@ public class AlphaVantageService : IAlphaVantageService
         string end)
     {
         var models = new List<StockData>();
-        if (response != null && ConfirmResponseIsValid(response))
+        if (ConfirmResponseIsValid(response))
         {
             response = response.Replace("\r", "");
             string[] rows = response.Split("\n");
@@ -98,7 +98,8 @@ public class AlphaVantageService : IAlphaVantageService
     private IEnumerable<StockData> ProcessBarResponseForStockData(string ticker, string response)
     {
         var models = new List<StockData>();
-        if (response != null && ConfirmResponseIsValid(response))
+
+        if (ConfirmResponseIsValid(response))
         {
             response = response.Replace("\r", "");
             string[] rows = response.Split("\n");
@@ -133,6 +134,12 @@ public class AlphaVantageService : IAlphaVantageService
 
     private bool ConfirmResponseIsValid(string response)
     {
+        if (string.IsNullOrWhiteSpace(response))
+        {
+            _logger.LogInformation("Response is invalid (either null, empty, or whitespace)");
+            return false;
+        }
+
         if (response.Contains("This is a premium endpoint"))
             throw new NotSupportedException("Request requires Premium subscription to AlphaVantage.");
 

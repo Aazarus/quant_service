@@ -41,6 +41,7 @@ public class AlphaVantageServiceTests
         string start = DateTime.Now.AddDays(-100).ToLongDateString();
         string end = DateTime.Now.ToLongDateString();
         const string period = "weekly";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
 
         _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, period, _apiKey.ApiKey))
             .ReturnsAsync(await Task.FromResult<string>(null!));
@@ -53,6 +54,73 @@ public class AlphaVantageServiceTests
         // Assert
         actual.Should().NotBeNull();
         actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockEOD_ShouldReturnAnEmptyCollectionForAnEmptyResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-100).ToLongDateString();
+        string end = DateTime.Now.ToLongDateString();
+        const string period = "weekly";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockEOD(ticker, start, end, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockEOD_ShouldReturnAnEmptyCollectionForAWhitespaceResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-100).ToLongDateString();
+        string end = DateTime.Now.ToLongDateString();
+        const string period = "weekly";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockEOD(ticker, start, end, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
     }
 
     [Fact]
@@ -162,6 +230,7 @@ public class AlphaVantageServiceTests
     {
         // Arrange
         const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
 
         _apiWrapper.Setup(w => w.GetStockBar(ticker, It.IsAny<int>(), It.IsAny<int>(), _apiKey.ApiKey))
             .ReturnsAsync(await Task.FromResult<string>(null!));
@@ -174,6 +243,67 @@ public class AlphaVantageServiceTests
         // Assert
         actual.Should().NotBeNull();
         actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockBar_ShouldReturnAnEmptyCollectionForAnEmptyResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockBar(ticker, It.IsAny<int>(), It.IsAny<int>(), _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockBar(ticker, 1, 1);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockBar_ShouldReturnAnEmptyCollectionForAWhitespaceResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockBar(ticker, It.IsAny<int>(), It.IsAny<int>(), _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockBar(ticker, 1, 1);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<StockData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
     }
 
     [Fact]
