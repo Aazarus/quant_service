@@ -11,6 +11,7 @@ using Data;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Models;
+using Models.AlphaVantage;
 using Moq;
 using Service.Services;
 using Wrapper;
@@ -393,5 +394,190 @@ public class AlphaVantageServiceTests
             It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
             It.IsAny<Exception>(),
             It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldReturnAnEmptyAvStockQuoteForNullResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult<string>(null!));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockQuote(ticker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new AvStockQuote());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldReturnAnEmptyAvStockQuoteForEmptyResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockQuote(ticker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new AvStockQuote());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldReturnAnAvStockQuoteForAWhitespaceResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Response is invalid (either null, empty, or whitespace)";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockQuote(ticker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new AvStockQuote());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Information,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldThrowANotSupportedExceptionIfRequired()
+    {
+        // Arrange
+        const string ticker = "IBM";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync("This is a premium endpoint");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<NotSupportedException>(async () =>
+            await _service.GetStockQuote(ticker));
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldThrowAnExceptionIfRequired()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        const string errorMessage = "Error calling AlphaVantage. API key may be invalid.";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync("parameter apikey is invalid or missing");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _service.GetStockQuote(ticker));
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldThrowAnExceptionForInvalidResponse()
+    {
+        // Arrange
+        var response =
+            @"symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent
+IBM,test";
+
+        const string ticker = "IBM";
+        const string errorMessage = "Input string was not in a correct format.";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync(response);
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockQuote(ticker);
+
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new AvStockQuote());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+
+        // Act
+
+        // Assert
+    }
+
+    [Fact]
+    public async Task GetStockQuote_ShouldReturnAValidAvStockQuoteForValidResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+
+        _apiWrapper.Setup(w => w.GetStockQuote(ticker, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(TestData.AvQuoteResponse));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetStockQuote(ticker);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Ticker.Should().Be("IBM");
+        actual.TimeStamp.Should().BeWithin(TimeSpan.FromSeconds(1));
+        actual.Open.Should().Be(132.6200m);
+        actual.High.Should().Be(134.0900m);
+        actual.Low.Should().Be(131.9800m);
+        actual.Price.Should().Be(134.0100m);
+        actual.Volume.Should().Be(2767054m);
+        actual.PrevClose.Should().Be(132.5400m);
+        actual.Change.Should().Be(1.4700m);
+        actual.ChangePercent.Should().Be(0.011091m);
     }
 }

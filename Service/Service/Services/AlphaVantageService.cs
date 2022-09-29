@@ -5,6 +5,7 @@
 namespace Service.Services;
 
 using Models;
+using Models.AlphaVantage;
 using Wrapper;
 
 public class AlphaVantageService : IAlphaVantageService
@@ -50,6 +51,13 @@ public class AlphaVantageService : IAlphaVantageService
     {
         string response = await _apiWrapper.GetStockBar(ticker, interval, outputSize, _apiKey.ApiKey);
         return ProcessBarResponseForStockData(ticker, response).OrderBy(d => d.Date).ToList();
+    }
+
+    /// <inheritdoc />
+    public async Task<AvStockQuote> GetStockQuote(string ticker)
+    {
+        string response = await _apiWrapper.GetStockQuote(ticker, _apiKey.ApiKey);
+        return ProcessQuoteResponseForAvStockQuote(response);
     }
 
     private IEnumerable<StockData> ProcessEODResponseForStockData(string ticker, string response, string start,
@@ -130,6 +138,43 @@ public class AlphaVantageService : IAlphaVantageService
         }
 
         return models;
+    }
+
+    private AvStockQuote ProcessQuoteResponseForAvStockQuote(string response)
+    {
+        if (ConfirmResponseIsValid(response))
+        {
+            response = response.Replace("\r", "");
+            string[] rows = response.Split("\n");
+
+            foreach (string row in rows.Skip(1))
+            {
+                string[] r = row.Split(",");
+
+                try
+                {
+                    return new AvStockQuote
+                    {
+                        Ticker = r[0],
+                        TimeStamp = DateTime.Now,
+                        Open = decimal.Parse(r[1]),
+                        High = decimal.Parse(r[2]),
+                        Low = decimal.Parse(r[3]),
+                        Price = decimal.Parse(r[4]),
+                        Volume = decimal.Parse(r[5]),
+                        PrevClose = decimal.Parse(r[7]),
+                        Change = decimal.Parse(r[8]),
+                        ChangePercent = decimal.Parse(r[9].TrimEnd('%', ' ')) / 100m
+                    };
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
+            }
+        }
+
+        return new AvStockQuote();
     }
 
     private bool ConfirmResponseIsValid(string response)
