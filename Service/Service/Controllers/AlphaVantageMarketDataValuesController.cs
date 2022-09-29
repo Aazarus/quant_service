@@ -79,6 +79,19 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
+    [Route("AVQuote/{ticker}")]
+    [HttpGet]
+    public async Task<IActionResult> GetAvQuote(string ticker)
+    {
+        if (string.IsNullOrWhiteSpace(ticker)) return BadRequest("Ticker is invalid");
+
+        var data = await _avService.GetStockQuote(ticker);
+
+        if (string.IsNullOrWhiteSpace(data.Ticker)) return NotFound($"No data for Ticker: {ticker}");
+
+        return Ok(data);
+    }
+
     /// <summary>
     ///     Checks if a string is a valid yyy-MM-dd date.
     /// </summary>
