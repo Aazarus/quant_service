@@ -33,4 +33,14 @@ public interface IAlphaVantageWrapper
     /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
     /// <returns>A string containing the Stock Quote data.</returns>
     Task<string> GetStockQuote(string ticker, string apiKey);
+
+    /// <summary>
+    ///     Gets the EOD data for a given ticker between the start and end dates.
+    /// </summary>
+    /// <param name="ticker">The ticker.</param>
+    /// <param name="start">The start Date.</param>
+    /// <param name="period">The period.</param>
+    /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
+    /// <returns>A string containing the EOD FX data.</returns>
+    Task<string> GetFxEOD(string ticker, string start, string period, string apiKey);
 }
