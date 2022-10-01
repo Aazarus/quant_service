@@ -5,6 +5,7 @@
 namespace Service.Tests.Wrappers;
 
 using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Http;
 using System.Threading;
@@ -157,7 +158,7 @@ public class AlphaVantageWrapperTests
         const string ticker = "IBM";
         const int interval = 1;
         const int outputSize = 50;
-        const string apiKey = "Api Key";
+        const string apiKey = "ApiKey";
         const string errorMessage = $"Unknown error occurred calling AlphaVantage endpoint for ticker {ticker}.";
 
         // Setup HttpMessageHandler
@@ -190,7 +191,7 @@ public class AlphaVantageWrapperTests
         // Arrange
         const string expected = "result from AV";
         const string ticker = "IBM";
-        const string apiKey = "Api Key";
+        const string apiKey = "ApiKey";
 
         // Setup HttpMessageHandler
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -209,6 +210,298 @@ public class AlphaVantageWrapperTests
 
         // Act
         string actual = await _wrapper.GetStockQuote(ticker, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldThrowExceptionForInvalidTicker()
+    {
+        // Arrange
+        const string ticker = "GBPUSDEUR";
+        var start = DateTime.Now.AddYears(-10).ToString(CultureInfo.InvariantCulture);
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _wrapper.GetFxEOD(ticker, start, period, apiKey));
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldRemoveBackslashFromTicker()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        var start = DateTime.Now.AddYears(-10).ToString(CultureInfo.InvariantCulture);
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+        const string expectedTickerToFrom = "from_symbol=GBP&to_ticker=USD";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedTickerToFrom)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldUseFullIfDateIsLessThan120DaysFromCurrentDate()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "outputsize=full";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldUseCompactIfDateIsMoreThan120DaysFromCurrentDate()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-121).ToLongDateString();
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "outputsize=compact";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldThrowExceptionForInvalidPeriod()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-121).ToLongDateString();
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "outputsize=compact";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(async () =>
+            await _wrapper.GetFxEOD(ticker, start, null!, apiKey));
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldUseWeeklyStringForRespectivePeriod()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-121).ToLongDateString();
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "FX_WEEKLY";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldUseMonthlyStringForRespectivePeriod()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-121).ToLongDateString();
+        const string period = "monthly";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "FX_MONTHLY";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldUseDailyStringForNonWeeklyOrMonthlyPeriod()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-121).ToLongDateString();
+        const string period = "";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "FX_DAILY";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldReturnValidAVResu()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-90).ToLongDateString();
+        const string period = "";
+        const string apiKey = "ApiKey";
+        const string expectedUrl =
+            "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=GBP&to_ticker=USD&outputsize=full&apikey=ApiKey&datatype=csv";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedUrl)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
 
         // Assert
         actual.Should().NotBeNull();

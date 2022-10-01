@@ -37,7 +37,7 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     {
         var startDate = DateTime.Parse(start);
         string size = GetEODSize(startDate);
-        string timeSeries = GetEODTimeSeries(period);
+        string timeSeries = GetStockEODTimeSeries(period);
         string url = GenerateEODUrl(timeSeries, ticker, size, apiKey);
 
         return await CallAlphaVantage(ticker, url);
@@ -63,12 +63,29 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return await CallAlphaVantage(ticker, url);
     }
 
-    private static string GetEODSize(DateTime startDate)
+    public async Task<string> GetFxEOD(string ticker, string start, string period, string apiKey)
     {
-        return startDate < DateTime.Today.AddDays(-120) ? "full" : "compact";
+        // ToDo: This needs tests.
+        ticker = SanitiseFxTicker(ticker);
+        string fromTicker = ticker[..3];
+        string toTicker = ticker.Substring(3, 3);
+        var startDate = DateTime.Parse(start);
+        string size = GetEODSize(startDate);
+        string function = GetFxEODFunction(period);
+
+        string url = GenerateFxEODUrl(function, fromTicker, toTicker, size, apiKey);
+
+        return await CallAlphaVantage(ticker, url);
     }
 
-    private static string GetEODTimeSeries(string period)
+    private static string GetEODSize(DateTime startDate)
+    {
+        const int earlier = -1;
+        var dateThreshold = DateTime.Now.AddDays(-120);
+        return DateTime.Compare(startDate, dateThreshold) == earlier ? "compact" : "full";
+    }
+
+    private static string GetStockEODTimeSeries(string period)
     {
         if (period == null) throw new ArgumentNullException(nameof(period));
 
@@ -80,10 +97,29 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         };
     }
 
+    private static string GetFxEODFunction(string period)
+    {
+        if (period == null) throw new ArgumentNullException(nameof(period), "Period is invalid.");
+
+        return period.ToLowerInvariant() switch
+        {
+            "weekly" => "FX_WEEKLY",
+            "monthly" => "FX_MONTHLY",
+            _ => "FX_DAILY"
+        };
+    }
+
     private static string GenerateEODUrl(string timeSeries, string ticker, string size, string apiKey)
     {
         return
             $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apikey={apiKey}&datatype=csv";
+    }
+
+    private static string GenerateFxEODUrl(string function, string fromTicker, string toTicker, string size,
+        string apiKey)
+    {
+        return
+            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}&outputsize={size}&apikey={apiKey}&datatype=csv";
     }
 
     private static string GetBarSize(int outputSize)
@@ -104,5 +140,14 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         }
 
         return history;
+    }
+
+    private static string SanitiseFxTicker(string ticker)
+    {
+        ticker = ticker.Contains('/') ? ticker.Replace("/", string.Empty) : ticker;
+
+        if (ticker.Length != 6) throw new Exception("Confirm ticker is in the correct format e.g. GBPUSD or GBP/USD");
+
+        return ticker;
     }
 }
