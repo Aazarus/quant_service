@@ -272,13 +272,13 @@ public class AlphaVantageWrapperTests
     }
 
     [Fact]
-    public async Task GetAvFxEod_ShouldUseFullIfDateIsLessThan120DaysFromCurrentDate()
+    public async Task GetAvFxEod_ShouldUseFullIfDateIsLessThan100DaysAndPeriodIsDailyFromCurrentDate()
     {
         // Arrange
         const string expected = "result from AV";
         const string ticker = "GBP/USD";
         string start = DateTime.Now.ToLongDateString();
-        const string period = "weekly";
+        const string period = "daily";
         const string apiKey = "ApiKey";
         const string expectedOutputsizeString = "outputsize=full";
 
@@ -286,7 +286,7 @@ public class AlphaVantageWrapperTests
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
-                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                    checkit(rm, expectedOutputsizeString)),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -305,14 +305,19 @@ public class AlphaVantageWrapperTests
         actual.Should().Be(expected);
     }
 
+    public bool checkit(HttpRequestMessage rm, string expected)
+    {
+        return rm.RequestUri!.AbsoluteUri.Contains(expected);
+    }
+
     [Fact]
-    public async Task GetAvFxEod_ShouldUseCompactIfDateIsMoreThan120DaysFromCurrentDate()
+    public async Task GetAvFxEod_ShouldUseCompactIfDateIsMoreThan100DaysAndPeriodIsDailyFromCurrentDate()
     {
         // Arrange
         const string expected = "result from AV";
         const string ticker = "GBP/USD";
-        string start = DateTime.Now.AddDays(-121).ToLongDateString();
-        const string period = "weekly";
+        string start = DateTime.Now.AddDays(-101).ToLongDateString();
+        const string period = "daily";
         const string apiKey = "ApiKey";
         const string expectedOutputsizeString = "outputsize=compact";
 
@@ -338,6 +343,41 @@ public class AlphaVantageWrapperTests
         actual.Should().NotBeNull();
         actual.Should().Be(expected);
     }
+
+    [Fact]
+    public async Task GetAvFxEod_ShouldNotUseOutputSizeForWeeklyPeriodFromCurrentDate()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-101).ToLongDateString();
+        const string period = "weekly";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "&outputsize=";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    !rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
 
     [Fact]
     public async Task GetAvFxEod_ShouldThrowExceptionForInvalidPeriod()
@@ -472,9 +512,8 @@ public class AlphaVantageWrapperTests
         actual.Should().Be(expected);
     }
 
-
     [Fact]
-    public async Task GetAvFxEod_ShouldReturnValidAVResu()
+    public async Task GetAvFxEod_ShouldReturnValidAVResult()
     {
         // Arrange
         const string expected = "result from AV";

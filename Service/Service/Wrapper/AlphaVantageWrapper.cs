@@ -70,8 +70,8 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         string fromTicker = ticker[..3];
         string toTicker = ticker.Substring(3, 3);
         var startDate = DateTime.Parse(start);
-        string size = GetEODSize(startDate);
         string function = GetFxEODFunction(period);
+        string size = function == "FX_DAILY" ? GetEODSize(startDate) : "";
 
         string url = GenerateFxEODUrl(function, fromTicker, toTicker, size, apiKey);
 
@@ -81,7 +81,8 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     private static string GetEODSize(DateTime startDate)
     {
         const int earlier = -1;
-        var dateThreshold = DateTime.Now.AddDays(-120);
+        const int outputSizeThreshold = -100;
+        var dateThreshold = DateTime.Now.AddDays(outputSizeThreshold);
         return DateTime.Compare(startDate, dateThreshold) == earlier ? "compact" : "full";
     }
 
@@ -118,8 +119,10 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
     private static string GenerateFxEODUrl(string function, string fromTicker, string toTicker, string size,
         string apiKey)
     {
+        var outputSize = $"&outputsize={size}";
+        if (string.IsNullOrWhiteSpace(size)) outputSize = string.Empty;
         return
-            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}&outputsize={size}&apikey={apiKey}&datatype=csv";
+            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}{outputSize}&apikey={apiKey}&datatype=csv";
     }
 
     private static string GetBarSize(int outputSize)
