@@ -60,6 +60,13 @@ public class AlphaVantageService : IAlphaVantageService
         return ProcessQuoteResponseForAvStockQuote(response);
     }
 
+    /// <inheritdoc />
+    public async Task<List<AvFxData>> GetFxEOD(string ticker, string start, string period)
+    {
+        string response = await _apiWrapper.GetFxEOD(ticker, start, period, _apiKey.ApiKey);
+        return ProcessFxDataResponseForAvFxData(ticker, response);
+    }
+
     private IEnumerable<StockData> ProcessEODResponseForStockData(string ticker, string response, string start,
         string end)
     {
@@ -175,6 +182,45 @@ public class AlphaVantageService : IAlphaVantageService
         }
 
         return new AvStockQuote();
+    }
+
+    private List<AvFxData> ProcessFxDataResponseForAvFxData(string ticker, string response)
+    {
+        if (ConfirmResponseIsValid(response))
+        {
+            ticker = AlphaVantageWrapper.SanitiseFxTicker(ticker);
+            var models = new List<AvFxData>();
+
+            response = response.Replace("\r", "");
+            string[] rows = response.Split("\n");
+
+            foreach (string row in rows.Skip(1))
+            {
+                string[] r = row.Split(",");
+
+                try
+                {
+                    var date = DateTime.Parse(r[0]);
+                    models.Add(new AvFxData
+                    {
+                        Ticker = ticker,
+                        Date = date,
+                        Open = decimal.Parse(r[1]),
+                        High = decimal.Parse(r[2]),
+                        Low = decimal.Parse(r[3]),
+                        Close = decimal.Parse(r[4])
+                    });
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex.Message);
+                }
+            }
+
+            return models.OrderBy(d => d.Date).ToList();
+        }
+
+        return new List<AvFxData>();
     }
 
     private bool ConfirmResponseIsValid(string response)

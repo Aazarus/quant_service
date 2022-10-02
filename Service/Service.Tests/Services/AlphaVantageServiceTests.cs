@@ -195,7 +195,7 @@ public class AlphaVantageServiceTests
     }
 
     [Fact]
-    public async Task GetStockEOD_ShouldThrowExceptionForInvalidResponse()
+    public async Task GetStockEOD_ShouldThrowExceptionAndLogForInvalidResponse()
     {
         // Arrange
         const string ticker = "IBM";
@@ -369,7 +369,7 @@ public class AlphaVantageServiceTests
     }
 
     [Fact]
-    public async Task GetStockBar_ShouldThrowExceptionForInvalidResponse()
+    public async Task GetStockBar_ShouldThrowExceptionAndLogForInvalidResponse()
     {
         // Arrange
         const string ticker = "IBM";
@@ -520,11 +520,10 @@ public class AlphaVantageServiceTests
     }
 
     [Fact]
-    public async Task GetStockQuote_ShouldThrowAnExceptionForInvalidResponse()
+    public async Task GetStockQuote_ShouldThrowAnExceptionAndLogForInvalidResponse()
     {
         // Arrange
-        var response =
-            @"symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent
+        const string response = @"symbol,open,high,low,price,volume,latestDay,previousClose,change,changePercent
 IBM,test";
 
         const string ticker = "IBM";
@@ -538,6 +537,7 @@ IBM,test";
         // Act
         var actual = await _service.GetStockQuote(ticker);
 
+        // Assert
         actual.Should().NotBeNull();
         actual.Should().BeEquivalentTo(new AvStockQuote());
 
@@ -547,10 +547,6 @@ IBM,test";
             It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
             It.IsAny<Exception>(),
             It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
-
-        // Act
-
-        // Assert
     }
 
     [Fact]
@@ -579,5 +575,166 @@ IBM,test";
         actual.PrevClose.Should().Be(132.5400m);
         actual.Change.Should().Be(1.4700m);
         actual.ChangePercent.Should().Be(0.011091m);
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForNullResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult<string>(null!));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForEmptyResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForWhitespaceResponse()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldThrowANotSupportedExceptionIfPremiumAlphaVantageEndpoint()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync("This is a premium endpoint");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<NotSupportedException>(async () =>
+            await _service.GetFxEOD(ticker, start, period));
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldThrowExceptionForInvalidAPIKey()
+    {
+        // Arrange
+        const string ticker = "IBM";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+        const string errorMessage = "Error calling AlphaVantage. API key may be invalid.";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync("parameter apikey is invalid or missing");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _service.GetFxEOD(ticker, start, period));
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldThrowAnExceptionAndLogForInvalidResponse()
+    {
+        // Arrange
+        const string response = @"timestamp,open,high,low,close,volume
+2022-09-01 12:00:00,test";
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+        const string errorMessage = "Input string was not in a correct format.";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(response);
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnAValidCollectionOfAvfXDataForValidResponse()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        string start = DateTime.Now.AddDays(-60).ToLongDateString();
+        const string period = "weekly";
+
+        _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
+            .ReturnsAsync(TestData.AvFXResponse);
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(TestData.AvFxData);
     }
 }
