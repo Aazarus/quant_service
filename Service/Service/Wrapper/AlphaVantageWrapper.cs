@@ -145,7 +145,7 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return history;
     }
 
-    private static string SanitiseFxTicker(string ticker)
+    public static string SanitiseFxTicker(string ticker)
     {
         ticker = ticker.Contains('/') ? ticker.Replace("/", string.Empty) : ticker;
 
