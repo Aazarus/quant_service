@@ -726,7 +726,7 @@ IBM,test";
         const string period = "weekly";
 
         _apiWrapper.Setup(w => w.GetFxEOD(ticker, start, period, _apiKey.ApiKey))
-            .ReturnsAsync(TestData.AvFXResponse);
+            .ReturnsAsync(TestData.AvFxResponse);
 
         _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
 

@@ -592,7 +592,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
         ChangePercent = 0.011091m
     };
 
-    public static string AvFXResponse =
+    public static string AvFxResponse =
         @"timestamp,open,high,low,close,volume\r\n
 2022-09-30 19:44:00,119.0500,119.0500,119.0500,119.0500,100\r\n
 2022-09-30 17:29:00,119.0500,119.0500,119.0500,119.0500,225\r\n
@@ -603,9 +603,9 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
 
 2022-09-30 16:29:00,119.1600,119.1600,119.1600,119.1600,215\r\n";
 
-    public static IEnumerable<AvFxData> AvFxData = new List<AvFxData>
+    public static List<AvFxData> AvFxData = new()
     {
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 19:44:00"),
@@ -614,7 +614,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 119.0500m,
             Close = 119.0500m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 17:29:00"),
@@ -623,7 +623,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 119.0500m,
             Close = 119.0500m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 17:08:00"),
@@ -632,7 +632,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 119.0000m,
             Close = 119.0000m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 17:00:00"),
@@ -641,7 +641,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 118.8500m,
             Close = 118.8500m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 16:52:00"),
@@ -650,7 +650,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 118.9700m,
             Close = 118.9700m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 16:49:00"),
@@ -659,7 +659,7 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
             Low = 119.0000m,
             Close = 119.0000m
         },
-        new()
+        new AvFxData
         {
             Ticker = "GBPUSD",
             Date = DateTime.Parse("2022-09-30 16:29:00"),
