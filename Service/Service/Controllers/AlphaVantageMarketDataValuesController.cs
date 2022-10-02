@@ -92,6 +92,21 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
+    [Route("AvFxEOD/{ticker}/{start}/{period}")]
+    [HttpGet]
+    public async Task<IActionResult> GetAvFxEOD(string ticker, string start, string period)
+    {
+        if (string.IsNullOrWhiteSpace(ticker)) return BadRequest("Ticker is invalid");
+        if (string.IsNullOrWhiteSpace(start)) return BadRequest("Start Date is invalid");
+        if (string.IsNullOrWhiteSpace(period)) return BadRequest("Period is invalid");
+
+        var data = await _avService.GetFxEOD(ticker, start, period);
+
+        if (!data.Any()) return NotFound($"No data for FX Ticker: {ticker}");
+
+        return Ok(data);
+    }
+
     /// <summary>
     ///     Checks if a string is a valid yyy-MM-dd date.
     /// </summary>

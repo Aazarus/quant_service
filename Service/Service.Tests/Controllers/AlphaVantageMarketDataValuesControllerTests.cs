@@ -4,6 +4,7 @@
 
 namespace Service.Tests.Controllers;
 
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -319,7 +320,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetAvStockEod_ShouldReturnNotFoundForUnknownTicker()
+    public async Task GetAvStockEod_ShouldReturnNotFoundForTickerWithNoData()
     {
         // Arrange
         const string ticker = "IBM";
@@ -455,7 +456,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetAvStockBar_ShouldReturnNotFoundForUnknownTicker()
+    public async Task GetAvStockBar_ShouldReturnNotFoundForTickerWithNoData()
     {
         // Arrange
         const string ticker = "IBM";
@@ -560,7 +561,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetAvQuote_ShouldReturnNotFoundForWhitespaceTicker()
+    public async Task GetAvQuote_ShouldReturnNotFoundForTickerWithNoData()
     {
         const string ticker = "IBM";
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
@@ -603,5 +604,247 @@ public class AlphaVantageMarketDataValuesControllerTests
         actualObj.Should().NotBeNull();
         actualObj!.StatusCode.Should().Be(200);
         actualObj!.Value.Should().BeEquivalentTo(TestData.AvStockQuote);
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForNullTicker()
+    {
+        // Arrange
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(null!, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyTicker()
+    {
+        // Arrange
+        var ticker = string.Empty;
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespaceTicker()
+    {
+        // Arrange
+        const string ticker = " ";
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForNullStartDate()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, null!, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Start Date is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyStartDate()
+    {
+        const string ticker = "GBP/USD";
+        var start = string.Empty;
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Start Date is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespaceStartDate()
+    {
+        const string ticker = "GBP/USD";
+        const string start = " ";
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Start Date is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForNullPeriod()
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        string start = DateTime.Now.ToLongDateString();
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, null!);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Period is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyPeriod()
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        string start = DateTime.Now.ToLongDateString();
+        var period = string.Empty;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Period is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespacePeriod()
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        string start = DateTime.Now.ToLongDateString();
+        const string period = " ";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Period is invalid");
+    }
+
+    [Fact]
+    public async Task GetAvFxData_ShouldReturnNotFoundForTickerWithNoData()
+    {
+        const string ticker = "GBPUSD";
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxEOD(ticker, start, period))
+            .ReturnsAsync(new List<AvFxData>());
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be($"No data for FX Ticker: {ticker}");
+    }
+
+    [Fact]
+    public async Task GetAvFxData_ShouldReturnAnOkActionResult()
+    {
+        const string ticker = "GBPUSD";
+        string start = DateTime.Now.ToLongDateString();
+        const string period = "daily";
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxEOD(ticker, start, period))
+            .ReturnsAsync(TestData.AvFxData);
+
+        // Act
+        var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<OkObjectResult>();
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj!.Value.Should().BeEquivalentTo(TestData.AvFxData);
     }
 }
