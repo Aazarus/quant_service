@@ -34,4 +34,13 @@ public interface IAlphaVantageService
     /// <param name="ticker">The stock Ticker.</param>
     /// <returns>An AvStockQuote object.</returns>
     Task<AvStockQuote> GetStockQuote(string ticker);
+
+    /// <summary>
+    ///     Gets the EOD data for a given FX ticker.
+    /// </summary>
+    /// <param name="ticker">The ticker.</param>
+    /// <param name="start">The start Date.</param>
+    /// <param name="period">The period.</param>
+    /// <returns>An AvFxData object.</returns>
+    Task<List<AvFxData>> GetFxEOD(string ticker, string start, string period);
 }
