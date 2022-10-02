@@ -592,6 +592,92 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
         ChangePercent = 0.011091m
     };
 
+    public static string AvFXResponse =
+        @"timestamp,open,high,low,close,volume\r\n
+2022-09-30 19:44:00,119.0500,119.0500,119.0500,119.0500,100\r\n
+2022-09-30 17:29:00,119.0500,119.0500,119.0500,119.0500,225\r\n
+2022-09-30 17:08:00,119.0000,119.0000,119.0000,119.0000,430\r\n
+2022-09-30 17:00:00,118.8600,118.8600,118.8500,118.8500,1278\r\n
+2022-09-30 16:52:00,118.9700,118.9700,118.9700,118.9700,408\r\n
+2022-09-30 16:49:00,119.0000,119.0000,119.0000,119.0000,317\r\n
+
+2022-09-30 16:29:00,119.1600,119.1600,119.1600,119.1600,215\r\n";
+
+    public static IEnumerable<AvFxData> AvFxData = new List<AvFxData>
+    {
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 19:44:00"),
+            Open = 119.0500m,
+            High = 119.0500m,
+            Low = 119.0500m,
+            Close = 119.0500m,
+            Volume = 100m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 17:29:00"),
+            Open = 119.0500m,
+            High = 119.0500m,
+            Low = 119.0500m,
+            Close = 119.0500m,
+            Volume = 225m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 17:08:00"),
+            Open = 119.0000m,
+            High = 119.0000m,
+            Low = 119.0000m,
+            Close = 119.0000m,
+            Volume = 430m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 17:00:00"),
+            Open = 118.8600m,
+            High = 118.8600m,
+            Low = 118.8500m,
+            Close = 118.8500m,
+            Volume = 1278m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 16:52:00"),
+            Open = 118.9700m,
+            High = 118.9700m,
+            Low = 118.9700m,
+            Close = 118.9700m,
+            Volume = 408m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 16:49:00"),
+            Open = 119.0000m,
+            High = 119.0000m,
+            Low = 119.0000m,
+            Close = 119.0000m,
+            Volume = 317m
+        },
+        new()
+        {
+            Ticker = "GBPUSD",
+            Date = DateTime.Parse("2022-09-30 16:29:00"),
+            Open = 119.1600m,
+            High = 119.1600m,
+            Low = 119.1600m,
+            Close = 119.1600m,
+            Volume = 215m
+        }
+    };
+
+
     // This is a copy of IEXService method. Possibly worth reusing that version.
     [ExcludeFromCodeCoverage]
     private static DateTime FromUnixTime(decimal? uTime)
