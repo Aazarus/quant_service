@@ -107,6 +107,21 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
+    [Route("AvFxBar/{ticker}/{interval:int}/{outputsize:int}")]
+    [HttpGet]
+    public async Task<IActionResult> GetAvFxBar(string ticker, int interval, int outputsize)
+    {
+        if (string.IsNullOrWhiteSpace(ticker)) return BadRequest("Ticker is invalid");
+        if (!ConfirmFxBarIntervalIsValid(interval)) return BadRequest("Interval must be 1, 5, 15, 30, or 60");
+        if (outputsize <= 0) return BadRequest("Outputsize must be greater than 0");
+
+        var data = await _avService.GetFxBar(ticker, interval, outputsize);
+
+        if (!data.Any()) return NotFound($"No data for FX Ticker: {ticker}");
+
+        return Ok(data);
+    }
+
     /// <summary>
     ///     Checks if a string is a valid yyy-MM-dd date.
     /// </summary>
@@ -116,5 +131,24 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
     {
         return DateTime.TryParseExact(date, "yyyy-MM-dd", CultureInfo.CurrentCulture, DateTimeStyles.None,
             out _);
+    }
+
+    /// <summary>
+    ///     Confirms a provided interval is valid for the AlphaVantage API.
+    /// </summary>
+    /// <param name="interval">The interval to check.</param>
+    /// <returns>True if valid else false</returns>
+    /// <exception cref="Exception"></exception>
+    private static bool ConfirmFxBarIntervalIsValid(int interval)
+    {
+        return interval switch
+        {
+            1 => true,
+            5 => true,
+            15 => true,
+            30 => true,
+            60 => true,
+            _ => false
+        };
     }
 }

@@ -607,7 +607,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForNullTicker()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForNullTicker()
     {
         // Arrange
         string start = DateTime.Now.ToLongDateString();
@@ -628,7 +628,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyTicker()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForEmptyTicker()
     {
         // Arrange
         var ticker = string.Empty;
@@ -650,7 +650,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespaceTicker()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForWhitespaceTicker()
     {
         // Arrange
         const string ticker = " ";
@@ -672,7 +672,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForNullStartDate()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForNullStartDate()
     {
         // Arrange
         const string ticker = "GBP/USD";
@@ -693,7 +693,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyStartDate()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForEmptyStartDate()
     {
         const string ticker = "GBP/USD";
         var start = string.Empty;
@@ -714,7 +714,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespaceStartDate()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForWhitespaceStartDate()
     {
         const string ticker = "GBP/USD";
         const string start = " ";
@@ -735,7 +735,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForNullPeriod()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForNullPeriod()
     {
         // Arrange
         const string ticker = "GBPUSD";
@@ -756,7 +756,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForEmptyPeriod()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForEmptyPeriod()
     {
         // Arrange
         const string ticker = "GBPUSD";
@@ -778,7 +778,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnBadRequestForWhitespacePeriod()
+    public async Task GetAvFxEOD_ShouldReturnBadRequestForWhitespacePeriod()
     {
         // Arrange
         const string ticker = "GBPUSD";
@@ -800,7 +800,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetAvFxData_ShouldReturnNotFoundForTickerWithNoData()
+    public async Task GetAvFxEOD_ShouldReturnNotFoundForTickerWithNoData()
     {
         const string ticker = "GBPUSD";
         string start = DateTime.Now.ToLongDateString();
@@ -824,7 +824,7 @@ public class AlphaVantageMarketDataValuesControllerTests
     }
 
     [Fact]
-    public async Task GetAvFxData_ShouldReturnAnOkActionResult()
+    public async Task GetAvFxEOD_ShouldReturnAnOkActionResult()
     {
         const string ticker = "GBPUSD";
         string start = DateTime.Now.ToLongDateString();
@@ -837,6 +837,200 @@ public class AlphaVantageMarketDataValuesControllerTests
 
         // Act
         var actual = await _controller.GetAvFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<OkObjectResult>();
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj!.Value.Should().BeEquivalentTo(TestData.AvFxData);
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnBadRequestForNullTicker()
+    {
+        // Arrange
+        const int interval = 1;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(null!, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnBadRequestForEmptyTicker()
+    {
+        // Arrange
+        var ticker = string.Empty;
+        const int interval = 1;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnBadRequestForWhitespaceTicker()
+    {
+        // Arrange
+        const string ticker = " ";
+        const int interval = 1;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Ticker is invalid");
+    }
+
+    [Theory]
+    [InlineData(1)]
+    [InlineData(5)]
+    [InlineData(15)]
+    [InlineData(30)]
+    [InlineData(60)]
+    public async Task GetFxBar_ShouldNotThrowBadRequestForValidIntervals(int interval)
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxBar(ticker, interval, outputsize))
+            .ReturnsAsync(TestData.AvFxData);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<OkObjectResult>();
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldThrowBadRequestForInvalidInterval()
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        const int interval = 2;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxBar(ticker, interval, outputsize))
+            .ReturnsAsync(TestData.AvFxData);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Interval must be 1, 5, 15, 30, or 60");
+    }
+
+    [Theory]
+    [InlineData(0)]
+    [InlineData(-1)]
+    [InlineData(-5)]
+    public async Task GetFxBar_ShouldThrowBadRequestForInvalidOutputsize(int outputsize)
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        const int interval = 1;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxBar(ticker, interval, outputsize))
+            .ReturnsAsync(TestData.AvFxData);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<BadRequestObjectResult>();
+
+        var actualObj = actual as BadRequestObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(400);
+        actualObj.Value.Should().Be("Outputsize must be greater than 0");
+    }
+
+    [Fact]
+    public async Task GetAvFxBar_ShouldReturnNotFoundForTickerWithNoData()
+    {
+        const string ticker = "GBPUSD";
+        const int interval = 1;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxBar(ticker, interval, outputsize))
+            .ReturnsAsync(new List<AvFxData>());
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be($"No data for FX Ticker: {ticker}");
+    }
+
+    [Fact]
+    public async Task GetAvFxBar_ShouldReturnAnOkActionResult()
+    {
+        // Arrange
+        const string ticker = "GBPUSD";
+        const int interval = 1;
+        const int outputsize = 99;
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+                s.GetFxBar(ticker, interval, outputsize))
+            .ReturnsAsync(TestData.AvFxData);
+
+        // Act
+        var actual = await _controller.GetAvFxBar(ticker, interval, outputsize);
 
         // Assert
         actual.Should().NotBeNull();
