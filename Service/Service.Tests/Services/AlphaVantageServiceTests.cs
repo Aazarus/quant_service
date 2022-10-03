@@ -578,7 +578,7 @@ IBM,test";
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForNullResponse()
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataCollectionForNullResponse()
     {
         // Arrange
         const string ticker = "IBM";
@@ -599,7 +599,7 @@ IBM,test";
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForEmptyResponse()
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataCollectionForEmptyResponse()
     {
         // Arrange
         const string ticker = "IBM";
@@ -620,7 +620,7 @@ IBM,test";
     }
 
     [Fact]
-    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataForWhitespaceResponse()
+    public async Task GetFxEOD_ShouldReturnEmptyAvFxDataCollectionForWhitespaceResponse()
     {
         // Arrange
         const string ticker = "IBM";
@@ -732,6 +732,164 @@ IBM,test";
 
         // Act
         var actual = await _service.GetFxEOD(ticker, start, period);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(TestData.AvFxData);
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnEmptyAvFxDataCollectionForNullResponse()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult<string>(null!));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnEmptyAvFxDataCollectionForEmptyResponse()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldReturnEmptyAvFxDataCollectionForWhitespaceResponse()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxBar(ticker, interval, outputsize);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvFxData>());
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldThrowANotSupportedExceptionIfPremiumAlphaVantageEndpoint()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync("This is a premium endpoint");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<NotSupportedException>(async () =>
+            await _service.GetFxBar(ticker, interval, outputsize));
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldThrowExceptionForInvalidAPIKey()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+        const string errorMessage = "Error calling AlphaVantage. API key may be invalid.";
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync("parameter apikey is invalid or missing");
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _service.GetFxBar(ticker, interval, outputsize));
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetFxBar_ShouldThrowAnExceptionAndLogForInvalidResponse()
+    {
+        // Arrange
+        const string response = @"timestamp,open,high,low,close,volume
+2022-09-01 12:00:00,test";
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+        const string errorMessage = "Input string was not in a correct format.";
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync(response);
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await _service.GetFxBar(ticker, interval, outputsize);
+
+        _logger.Verify(log => log.Log(
+            LogLevel.Error,
+            It.IsAny<EventId>(),
+            It.Is<It.IsAnyType>((v, t) => v.ToString() == errorMessage),
+            It.IsAny<Exception>(),
+            It.Is<Func<It.IsAnyType, Exception, string>>((v, t) => true)!), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetBar_ShouldReturnAValidCollectionOfAvfXDataForValidResponse()
+    {
+        // Arrange
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+
+        _apiWrapper.Setup(w => w.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey))
+            .ReturnsAsync(TestData.AvFxResponse);
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetFxBar(ticker, interval, outputsize);
 
         // Assert
         actual.Should().NotBeNull();

@@ -41,6 +41,15 @@ public interface IAlphaVantageService
     /// <param name="ticker">The ticker.</param>
     /// <param name="start">The start Date.</param>
     /// <param name="period">The period.</param>
-    /// <returns>An AvFxData object.</returns>
+    /// <returns>A collection of AvFxData objects.</returns>
     Task<List<AvFxData>> GetFxEOD(string ticker, string start, string period);
+
+    /// <summary>
+    ///     Gets the historical intraday bar data for a given FX ticker.
+    /// </summary>
+    /// <param name="ticker">The FX Ticker.</param>
+    /// <param name="interval">Time interval between data points.</param>
+    /// <param name="outputsize">Number of data points.</param>
+    /// <returns>A collection of AvFxData objects.</returns>
+    Task<List<AvFxData>> GetFxBar(string ticker, int interval, int outputsize);
 }
