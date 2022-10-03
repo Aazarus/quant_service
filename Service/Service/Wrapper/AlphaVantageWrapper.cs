@@ -63,9 +63,9 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return await CallAlphaVantage(ticker, url);
     }
 
+    /// <inheritdoc />
     public async Task<string> GetFxEOD(string ticker, string start, string period, string apiKey)
     {
-        // ToDo: This needs tests.
         ticker = SanitiseFxTicker(ticker);
         string fromTicker = ticker[..3];
         string toTicker = ticker.Substring(3, 3);
@@ -73,7 +73,21 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         string function = GetFxEODFunction(period);
         string size = function == "FX_DAILY" ? GetEODSize(startDate) : "";
 
-        string url = GenerateFxEODUrl(function, fromTicker, toTicker, size, apiKey);
+        string url = GenerateFxUrl(function, fromTicker, toTicker, size, apiKey);
+
+        return await CallAlphaVantage(ticker, url);
+    }
+
+    /// <inheritdoc />
+    public async Task<string> GetFxBar(string ticker, int interval, int outputsize, string apiKey)
+    {
+        ticker = SanitiseFxTicker(ticker);
+        string fromTicker = ticker[..3];
+        string toTicker = ticker.Substring(3, 3);
+        const string function = "FX_INTRADAY";
+        string size = outputsize > 100 ? "full" : "compact";
+
+        string url = GenerateFxUrl(function, fromTicker, toTicker, size, apiKey, interval);
 
         return await CallAlphaVantage(ticker, url);
     }
@@ -116,13 +130,16 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
             $"{AlphaVantageUrl}query?function={timeSeries}&symbol={ticker}&outputsize={size}&apikey={apiKey}&datatype=csv";
     }
 
-    private static string GenerateFxEODUrl(string function, string fromTicker, string toTicker, string size,
-        string apiKey)
+    private static string GenerateFxUrl(string function, string fromTicker, string toTicker, string size,
+        string apiKey, int? interval = null)
     {
         var outputSize = $"&outputsize={size}";
         if (string.IsNullOrWhiteSpace(size)) outputSize = string.Empty;
+
+        string intervalStr = interval != null ? $"&interval={interval}min" : string.Empty;
+
         return
-            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}{outputSize}&apikey={apiKey}&datatype=csv";
+            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}{intervalStr}{outputSize}&apikey={apiKey}&datatype=csv";
     }
 
     private static string GetBarSize(int outputSize)

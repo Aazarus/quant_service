@@ -237,6 +237,7 @@ public class AlphaVantageWrapperTests
             await _wrapper.GetFxEOD(ticker, start, period, apiKey));
     }
 
+    // This test handles checking the ticker sanitise method works.
     [Fact]
     public async Task GetAvFxEod_ShouldRemoveBackslashFromTicker()
     {
@@ -372,7 +373,6 @@ public class AlphaVantageWrapperTests
         actual.Should().NotBeNull();
         actual.Should().Be(expected);
     }
-
 
     [Fact]
     public async Task GetAvFxEod_ShouldThrowExceptionForInvalidPeriod()
@@ -536,6 +536,109 @@ public class AlphaVantageWrapperTests
 
         // Act
         string actual = await _wrapper.GetFxEOD(ticker, start, period, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxBar_ShouldUseFullWheOutputsizeGreaterThan100()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        const int interval = 5;
+        const int outputsize = 101;
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "outputsize=full";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxBar(ticker, interval, outputsize, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxBar_ShouldUseCompactWheOutputsizeLessThan100()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        const int interval = 5;
+        const int outputsize = 99;
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString = "outputsize=compact";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxBar(ticker, interval, outputsize, apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
+
+    [Fact]
+    public async Task GetAvFxBar_ShouldSetTheExpectedUrlReturningExpectedResult()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string ticker = "GBP/USD";
+        const int interval = 1;
+        const int outputsize = 99;
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString =
+            "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=GBP&to_ticker=USD&interval=1min&outputsize=compact&apikey=ApiKey&datatype=csv";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetFxBar(ticker, interval, outputsize, apiKey);
 
         // Assert
         actual.Should().NotBeNull();

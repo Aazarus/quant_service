@@ -43,4 +43,14 @@ public interface IAlphaVantageWrapper
     /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
     /// <returns>A string containing the EOD FX data.</returns>
     Task<string> GetFxEOD(string ticker, string start, string period, string apiKey);
+
+    /// <summary>
+    ///     Gets the historical intraday bar data for a given FX ticker.
+    /// </summary>
+    /// <param name="ticker">The FX Ticker.</param>
+    /// <param name="interval">Time interval between data points.</param>
+    /// <param name="outputsize">Number of data points.</param>
+    /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
+    /// <returns>A string contains the FX </returns>
+    Task<string> GetFxBar(string ticker, int interval, int outputsize, string apiKey);
 }
