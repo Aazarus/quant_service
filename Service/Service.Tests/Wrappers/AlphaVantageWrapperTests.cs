@@ -286,7 +286,7 @@ public class AlphaVantageWrapperTests
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
         mockHttpMessageHandler.Protected()
             .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
-                    checkit(rm, expectedOutputsizeString)),
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
                 ItExpr.IsAny<CancellationToken>())
             .ReturnsAsync(new HttpResponseMessage
             {
@@ -303,11 +303,6 @@ public class AlphaVantageWrapperTests
         // Assert
         actual.Should().NotBeNull();
         actual.Should().Be(expected);
-    }
-
-    public bool checkit(HttpRequestMessage rm, string expected)
-    {
-        return rm.RequestUri!.AbsoluteUri.Contains(expected);
     }
 
     [Fact]
