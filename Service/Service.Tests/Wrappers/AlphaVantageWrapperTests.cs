@@ -247,7 +247,7 @@ public class AlphaVantageWrapperTests
         var start = DateTime.Now.AddYears(-10).ToString(CultureInfo.InvariantCulture);
         const string period = "weekly";
         const string apiKey = "ApiKey";
-        const string expectedTickerToFrom = "from_symbol=GBP&to_ticker=USD";
+        const string expectedTickerToFrom = "from_symbol=GBP&to_symbol=USD";
 
         // Setup HttpMessageHandler
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -517,7 +517,7 @@ public class AlphaVantageWrapperTests
         const string period = "";
         const string apiKey = "ApiKey";
         const string expectedUrl =
-            "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=GBP&to_ticker=USD&outputsize=full&apikey=ApiKey&datatype=csv";
+            "https://www.alphavantage.co/query?function=FX_DAILY&from_symbol=GBP&to_symbol=USD&outputsize=full&apikey=ApiKey&datatype=csv";
 
         // Setup HttpMessageHandler
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
@@ -620,7 +620,7 @@ public class AlphaVantageWrapperTests
         const int outputsize = 99;
         const string apiKey = "ApiKey";
         const string expectedOutputsizeString =
-            "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=GBP&to_ticker=USD&interval=1min&outputsize=compact&apikey=ApiKey&datatype=csv";
+            "https://www.alphavantage.co/query?function=FX_INTRADAY&from_symbol=GBP&to_symbol=USD&interval=1min&outputsize=compact&apikey=ApiKey&datatype=csv";
 
         // Setup HttpMessageHandler
         var mockHttpMessageHandler = new Mock<HttpMessageHandler>();

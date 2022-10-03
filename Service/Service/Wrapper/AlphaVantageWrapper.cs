@@ -139,7 +139,7 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         string intervalStr = interval != null ? $"&interval={interval}min" : string.Empty;
 
         return
-            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_ticker={toTicker}{intervalStr}{outputSize}&apikey={apiKey}&datatype=csv";
+            $"{AlphaVantageUrl}query?function={function}&from_symbol={fromTicker}&to_symbol={toTicker}{intervalStr}{outputSize}&apikey={apiKey}&datatype=csv";
     }
 
     private static string GetBarSize(int outputSize)
