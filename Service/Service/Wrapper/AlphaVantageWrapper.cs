@@ -92,6 +92,13 @@ public class AlphaVantageWrapper : IAlphaVantageWrapper
         return await CallAlphaVantage(ticker, url);
     }
 
+    /// <inheritdoc />
+    public async Task<string> GetSectorPref(string apiKey)
+    {
+        var url = $"{AlphaVantageUrl}query?function=SECTOR&apikey={apiKey}";
+        return await CallAlphaVantage("Sector Performance Data", url);
+    }
+
     private static string GetEODSize(DateTime startDate)
     {
         const int earlier = -1;

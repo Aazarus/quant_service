@@ -644,4 +644,36 @@ public class AlphaVantageWrapperTests
         actual.Should().NotBeNull();
         actual.Should().Be(expected);
     }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldReturnExpectedResult()
+    {
+        // Arrange
+        const string expected = "result from AV";
+        const string apiKey = "ApiKey";
+        const string expectedOutputsizeString =
+            "https://www.alphavantage.co/query?function=SECTOR&apikey=ApiKey";
+
+        // Setup HttpMessageHandler
+        var mockHttpMessageHandler = new Mock<HttpMessageHandler>();
+        mockHttpMessageHandler.Protected()
+            .Setup<Task<HttpResponseMessage>>("SendAsync", ItExpr.Is<HttpRequestMessage>(rm =>
+                    rm.RequestUri!.AbsoluteUri.Contains(expectedOutputsizeString)),
+                ItExpr.IsAny<CancellationToken>())
+            .ReturnsAsync(new HttpResponseMessage
+            {
+                StatusCode = HttpStatusCode.OK,
+                Content = new StringContent(expected)
+            });
+
+        _httpClient = new HttpClient(mockHttpMessageHandler.Object);
+        _wrapper = new AlphaVantageWrapper(_logger.Object, _httpClient);
+
+        // Act
+        string actual = await _wrapper.GetSectorPref(apiKey);
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().Be(expected);
+    }
 }

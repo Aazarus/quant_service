@@ -51,6 +51,13 @@ public interface IAlphaVantageWrapper
     /// <param name="interval">Time interval between data points.</param>
     /// <param name="outputsize">Number of data points.</param>
     /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
-    /// <returns>A string contains the FX </returns>
+    /// <returns>A string contains the FX.</returns>
     Task<string> GetFxBar(string ticker, int interval, int outputsize, string apiKey);
+
+    /// <summary>
+    ///     Get real-time and historical Sector Performance data for S&amp;P 500 incumbents.
+    /// </summary>
+    /// <param name="apiKey">The ApiKey for AlphaVantage.</param>
+    /// <returns>A string containing the Sector Performance.</returns>
+    Task<string> GetSectorPref(string apiKey);
 }
