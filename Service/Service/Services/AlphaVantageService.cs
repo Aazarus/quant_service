@@ -6,6 +6,7 @@ namespace Service.Services;
 
 using Models;
 using Models.AlphaVantage;
+using Newtonsoft.Json;
 using Wrapper;
 
 public class AlphaVantageService : IAlphaVantageService
@@ -56,6 +57,7 @@ public class AlphaVantageService : IAlphaVantageService
     /// <inheritdoc />
     public async Task<AvStockQuote> GetStockQuote(string ticker)
     {
+        await GetSectorPref();
         string response = await _apiWrapper.GetStockQuote(ticker, _apiKey.ApiKey);
         return ProcessQuoteResponseForAvStockQuote(response);
     }
@@ -67,10 +69,18 @@ public class AlphaVantageService : IAlphaVantageService
         return ProcessFxEODDataResponseForAvFxData(ticker, response);
     }
 
+    /// <inheritdoc />
     public async Task<List<AvFxData>> GetFxBar(string ticker, int interval, int outputsize)
     {
         string response = await _apiWrapper.GetFxBar(ticker, interval, outputsize, _apiKey.ApiKey);
         return ProcessFxBarDataResponseForAvFxData(ticker, response);
+    }
+
+    /// <inheritdoc />
+    public async Task<List<AvSectorPref>> GetSectorPref()
+    {
+        string response = await _apiWrapper.GetSectorPref(_apiKey.ApiKey);
+        return ProcessSectorPerformanceForAvSectorPref(response);
     }
 
     private IEnumerable<StockData> ProcessEODResponseForStockData(string ticker, string response, string start,
@@ -266,6 +276,46 @@ public class AlphaVantageService : IAlphaVantageService
         }
 
         return new List<AvFxData>();
+    }
+
+    private List<AvSectorPref> ProcessSectorPerformanceForAvSectorPref(string response)
+    {
+        if (ConfirmResponseIsValid(response))
+        {
+            var res = JsonConvert.DeserializeObject<dynamic>(response);
+            var ranks = new[]
+            {
+                "Rank A: Real-Time Performance",
+                "Rank B: 1 Day Performance",
+                "Rank C: 5 Day Performance",
+                "Rank D: 1 Month Performance",
+                "Rank E: 3 Month Performance",
+                "Rank F: Year-to-Date (YTD) Performance",
+                "Rank G: 1 Year Performance",
+                "Rank H: 3 Year Performance",
+                "Rank I: 5 Year Performance",
+                "Rank J: 10 Year Performance"
+            };
+
+            return (from rank in ranks
+                where response.Contains(rank)
+                select new AvSectorPref
+                {
+                    Rank = rank,
+                    CommunicationServices = res[rank]["Communication Services"],
+                    ConsumerDiscretionary = res[rank]["Consumer Discretionary"],
+                    ConsumerStaples = res[rank]["Consumer Staples"],
+                    Energy = res[rank]["Energy"],
+                    Financials = res[rank]["Financials"],
+                    HealthCare = res[rank]["Health Care"],
+                    Industrials = res[rank]["Industrials"],
+                    InformationTechnology = res[rank]["Information Technology"],
+                    Materials = res[rank]["Materials"],
+                    Utilities = res[rank]["Utilities"]
+                }).ToList();
+        }
+
+        return new List<AvSectorPref>();
     }
 
     private bool ConfirmResponseIsValid(string response)

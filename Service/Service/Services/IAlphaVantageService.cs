@@ -52,4 +52,10 @@ public interface IAlphaVantageService
     /// <param name="outputsize">Number of data points.</param>
     /// <returns>A collection of AvFxData objects.</returns>
     Task<List<AvFxData>> GetFxBar(string ticker, int interval, int outputsize);
+
+    /// <summary>
+    ///     Get real-time and historical Sector Performance data for S&amp;P 500 incumbents.
+    /// </summary>
+    /// <returns>A collection of AvSectorPref objects.</returns>
+    Task<List<AvSectorPref>> GetSectorPref();
 }

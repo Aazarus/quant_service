@@ -895,4 +895,102 @@ IBM,test";
         actual.Should().NotBeNull();
         actual.Should().BeEquivalentTo(TestData.AvFxData);
     }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldReturnEmptyAvSectorPrefCollectionForNullResponse()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult<string>(null!));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetSectorPref();
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvSectorPref>());
+    }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldReturnEmptyAvSectorPrefCollectionForEmptyResponse()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(string.Empty));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetSectorPref();
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvSectorPref>());
+    }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldReturnEmptyAvSectorPrefCollectionForWhitespaceResponse()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(" "));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetSectorPref();
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(new List<AvSectorPref>());
+    }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldThrowANotSupportedExceptionIfPremiumAlphaVantageEndpoint()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult("This is a premium endpoint"));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<NotSupportedException>(async () =>
+            await _service.GetSectorPref());
+    }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldThrowExceptionForInvalidAPIKey()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult("parameter apikey is invalid or missing"));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        // Assert
+        await Assert.ThrowsAsync<Exception>(async () =>
+            await _service.GetSectorPref());
+    }
+
+    [Fact]
+    public async Task GetSectorPref_ShouldReturnAValidCollectionOfAvSectorPrefForValidResponse()
+    {
+        // Arrange
+        _apiWrapper.Setup(w => w.GetSectorPref(_apiKey.ApiKey))
+            .ReturnsAsync(await Task.FromResult(TestData.AvSectorPrefResponse));
+
+        _service = new AlphaVantageService(_logger.Object, _apiKey, _apiWrapper.Object);
+
+        // Act
+        var actual = await _service.GetSectorPref();
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeEquivalentTo(TestData.AvSectorPrefsData);
+    }
 }

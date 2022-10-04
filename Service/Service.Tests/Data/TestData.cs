@@ -670,6 +670,41 @@ IBM,132.6200,134.0900,131.9800,134.0100,2767054,2022-08-12,132.5400,1.4700,1.109
         }
     };
 
+    public static string AvSectorPrefResponse =
+        @"{'Meta Data': {Information: 'US Sector Performance (realtime & historical)','Last Refreshed':'2022-10-04 17:49:14 US/Eastern'},'Rank A: Real-Time Performance': {'Energy': '4.34%','Financials': '3.79%','Consumer Discretionary': '3.56%','Materials': '3.54%','Industrials': '3.49%','Information Technology': '3.30%','Communication Services': '2.72%','Health Care': '2.33%','Utilities': '2.15%','Real Estate': '1.62%','Consumer Staples': '1.53%'},'Rank B: 1 Day Performance': {'Energy': '5.77%','Materials': '3.40%','Information Technology': '3.15%','Industrials': '3.05%','Utilities': '2.99%','Communication Services': '2.98%','Financials': '2.84%','Health Care': '2.13%','Real Estate': '1.86%','Consumer Staples': '1.74%','Consumer Discretionary': '0.24%'}}";
+    //@"{{\""Meta Data\"": {\""Information\"": \""US Sector Performance (realtime & historical)\"",\""Last Refreshed\"": \""2022-10-04 17:49:14 US/Eastern\""},\""Rank A: Real-Time Performance\"": {\""Energy\"": \""4.34%\"",\""Financials\"": \""3.79%\"",\""Consumer Discretionary\"": \""3.56%\"",\""Materials\"": \""3.54%\"",\""Industrials\"": \""3.49%\"",\""Information Technology\"": \""3.30%\"",\""Communication Services\"": \""2.72%\"",\""Health Care\"": \""2.33%\"",\""Utilities\"": \""2.15%\"",\""Real Estate\"": \""1.62%\"",\""Consumer Staples\"": \""1.53%\""},\""Rank B: 1 Day Performance\"": {\""Energy\"": \""5.77%\"",\""Materials\"": \""3.40%\"",\""Information Technology\"": \""3.15%\"",\""Industrials\"": \""3.05%\"",\""Utilities\"": \""2.99%\"",\""Communication Services\"": \""2.98%\"",\""Financials\"": \""2.84%\"",\""Health Care\"": \""2.13%\"",\""Real Estate\"": \""1.86%\"",\""Consumer Staples\"": \""1.74%\"",\""Consumer Discretionary\"": \""0.24%\""}}";
+
+    public static List<AvSectorPref> AvSectorPrefsData = new()
+    {
+        new AvSectorPref
+        {
+            Rank = "Rank A: Real-Time Performance",
+            CommunicationServices = "2.72%",
+            ConsumerDiscretionary = "3.56%",
+            ConsumerStaples = "1.53%",
+            Energy = "4.34%",
+            Financials = "3.79%",
+            HealthCare = "2.33%",
+            Industrials = "3.49%",
+            InformationTechnology = "3.30%",
+            Materials = "3.54%",
+            Utilities = "2.15%"
+        },
+        new AvSectorPref
+        {
+            Rank = "Rank B: 1 Day Performance",
+            CommunicationServices = "2.98%",
+            ConsumerDiscretionary = "0.24%",
+            ConsumerStaples = "1.74%",
+            Energy = "5.77%",
+            Financials = "2.84%",
+            HealthCare = "2.13%",
+            Industrials = "3.05%",
+            InformationTechnology = "3.15%",
+            Materials = "3.40%",
+            Utilities = "2.99%"
+        }
+    };
 
     // This is a copy of IEXService method. Possibly worth reusing that version.
     [ExcludeFromCodeCoverage]
