@@ -1041,4 +1041,50 @@ public class AlphaVantageMarketDataValuesControllerTests
         actualObj!.StatusCode.Should().Be(200);
         actualObj!.Value.Should().BeEquivalentTo(TestData.AvFxData);
     }
+
+
+    [Fact]
+    public async Task GetSectorPerformance_ShouldReturnNotFoundForEmptyCollection()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+            s.GetSectorPref()).ReturnsAsync(new List<AvSectorPref>());
+
+
+        // Act
+        var actual = await _controller.GetSectorPerformance();
+
+        // Assert
+        actual.Should().BeOfType(typeof(NotFoundObjectResult));
+
+        var actualObj = actual as NotFoundObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(404);
+        actualObj.Value.Should().Be("No Sector Performance data found");
+    }
+
+    [Fact]
+    public async Task GetSectorPerformance_ShouldReturnAnOkActionResult()
+    {
+        // Arrange
+        _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
+
+        _avService.Setup(s =>
+            s.GetSectorPref()).ReturnsAsync(TestData.AvSectorPrefsData);
+
+
+        // Act
+        var actual = await _controller.GetSectorPerformance();
+
+        // Assert
+        actual.Should().NotBeNull();
+        actual.Should().BeOfType<OkObjectResult>();
+
+        var actualObj = actual as OkObjectResult;
+        actualObj.Should().NotBeNull();
+        actualObj!.StatusCode.Should().Be(200);
+        actualObj!.Value.Should().BeEquivalentTo(TestData.AvSectorPrefsData);
+    }
 }

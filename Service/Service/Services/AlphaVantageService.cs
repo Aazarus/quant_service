@@ -57,7 +57,6 @@ public class AlphaVantageService : IAlphaVantageService
     /// <inheritdoc />
     public async Task<AvStockQuote> GetStockQuote(string ticker)
     {
-        await GetSectorPref();
         string response = await _apiWrapper.GetStockQuote(ticker, _apiKey.ApiKey);
         return ProcessQuoteResponseForAvStockQuote(response);
     }

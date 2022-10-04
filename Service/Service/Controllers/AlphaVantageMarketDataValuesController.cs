@@ -122,6 +122,17 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
         return Ok(data);
     }
 
+    [Route("AvSector/Perf")]
+    [HttpGet]
+    public async Task<IActionResult> GetSectorPerformance()
+    {
+        var sectorPerformance = await _avService.GetSectorPref();
+
+        if (!sectorPerformance.Any()) return NotFound("No Sector Performance data found");
+
+        return Ok(sectorPerformance);
+    }
+
     /// <summary>
     ///     Checks if a string is a valid yyy-MM-dd date.
     /// </summary>
