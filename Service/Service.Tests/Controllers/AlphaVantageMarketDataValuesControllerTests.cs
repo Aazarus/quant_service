@@ -38,7 +38,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod(null!, "", "", "");
+        var actual = await _controller.GetAvStockEOD(null!, "", "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -56,7 +56,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("", "", "", string.Empty);
+        var actual = await _controller.GetAvStockEOD("", "", "", string.Empty);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -74,7 +74,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod(" ", "", "", string.Empty);
+        var actual = await _controller.GetAvStockEOD(" ", "", "", string.Empty);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -92,7 +92,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", null!, "", "");
+        var actual = await _controller.GetAvStockEOD("IBM", null!, "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -110,7 +110,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "", "", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "", "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -128,7 +128,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", " ", "", string.Empty);
+        var actual = await _controller.GetAvStockEOD("IBM", " ", "", string.Empty);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -146,7 +146,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "test date", "", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "test date", "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -164,7 +164,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2020/01/01", "", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "2020/01/01", "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -182,7 +182,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", null!, "");
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", null!, "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -200,7 +200,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", "", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", "", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -218,7 +218,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-02-02", " ", string.Empty);
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-02-02", " ", string.Empty);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -236,7 +236,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", "test date", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", "test date", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -254,7 +254,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", "2020/01/01", "");
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", "2020/01/01", "");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -272,7 +272,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", "2022-02-01", null!);
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", "2022-02-01", null!);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -290,7 +290,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-01-01", "2022-02-01", string.Empty);
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-01-01", "2022-02-01", string.Empty);
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -308,7 +308,7 @@ public class AlphaVantageMarketDataValuesControllerTests
         _controller = new AlphaVantageMarketDataValuesController(_logger.Object, _avService.Object);
 
         // Act
-        var actual = await _controller.GetAvStockEod("IBM", "2022-02-02", "2022-02-01", " ");
+        var actual = await _controller.GetAvStockEOD("IBM", "2022-02-02", "2022-02-01", " ");
 
         // Assert
         actual.Should().BeOfType(typeof(BadRequestObjectResult));
@@ -331,7 +331,7 @@ public class AlphaVantageMarketDataValuesControllerTests
             .ReturnsAsync(new List<StockData>());
 
         // Act
-        var actual = await _controller.GetAvStockEod(ticker, "2022-02-02", "2022-02-01", "weekly");
+        var actual = await _controller.GetAvStockEOD(ticker, "2022-02-02", "2022-02-01", "weekly");
 
         // Assert
         actual.Should().BeOfType(typeof(NotFoundObjectResult));
@@ -354,7 +354,7 @@ public class AlphaVantageMarketDataValuesControllerTests
             .ReturnsAsync(TestData.AvEODData.ToList());
 
         // Act
-        var actual = await _controller.GetAvStockEod(ticker, "2022-02-02", "2022-02-01", "weekly");
+        var actual = await _controller.GetAvStockEOD(ticker, "2022-02-02", "2022-02-01", "weekly");
 
         // Assert
         actual.Should().BeOfType(typeof(OkObjectResult));

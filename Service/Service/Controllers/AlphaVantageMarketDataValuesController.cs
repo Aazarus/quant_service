@@ -42,9 +42,9 @@ public class AlphaVantageMarketDataValuesController : ControllerBase
     /// <param name="end">The end date.</param>
     /// <param name="period">The data period range.</param>
     /// <returns>An IActionResult.</returns>
-    [Route("AVEod/{ticker}/{start}/{end}/{period}")]
+    [Route("AvEOD/{ticker}/{start}/{end}/{period}")]
     [HttpGet]
-    public async Task<IActionResult> GetAvStockEod(
+    public async Task<IActionResult> GetAvStockEOD(
         string ticker,
         string start,
         string end,
