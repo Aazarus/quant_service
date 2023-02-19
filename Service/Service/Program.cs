@@ -40,6 +40,13 @@ builder.Services.AddSingleton(
     }
 );
 
+builder.Services.AddSingleton(
+    new ApiKeySettings.Quandl
+    {
+        ApiKey = builder.Configuration.GetSection("ApiKeys:Quandl:ApiKey").Value!
+    }
+);
+
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
