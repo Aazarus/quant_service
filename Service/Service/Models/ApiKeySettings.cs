@@ -35,4 +35,15 @@ public class ApiKeySettings
         /// </summary>
         public string ApiKey { get; set; } = "";
     }
+
+    /// <summary>
+    ///     Defines the class holding the API Key for Quandl access.
+    /// </summary>
+    public class Quandl
+    {
+        /// <summary>
+        ///     Gets or sets the Api Key for Quandl access.
+        /// </summary>
+        public string ApiKey { get; set; } = "";
+    }
 }
