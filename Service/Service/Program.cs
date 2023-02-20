@@ -23,6 +23,8 @@ builder.Services.AddSingleton<IIEXService, IEXService>();
 builder.Services.AddSingleton<IIEXApiWrapper, IEXApiWrapper>();
 builder.Services.AddSingleton<IAlphaVantageWrapper, AlphaVantageWrapper>();
 builder.Services.AddSingleton<IAlphaVantageService, AlphaVantageService>();
+builder.Services.AddSingleton<IQuandlWrapper, QuandlWrapper>();
+builder.Services.AddSingleton<IQuandlService, QuandlService>();
 
 // API Keys
 builder.Services.AddSingleton(
