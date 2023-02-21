@@ -35,6 +35,7 @@ public class IsdaController : Controller
 
     [Route("IsdaRate/{currency}/{date}")]
     [HttpGet]
+    [Obsolete("Markit has discontinued this API endpoint")]
     public async Task<IActionResult> GetIsdaRate(string currency, string date)
     {
         if (string.IsNullOrWhiteSpace(currency)) return BadRequest("Currency is invalid");
