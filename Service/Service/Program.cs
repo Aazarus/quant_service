@@ -25,6 +25,8 @@ builder.Services.AddSingleton<IAlphaVantageWrapper, AlphaVantageWrapper>();
 builder.Services.AddSingleton<IAlphaVantageService, AlphaVantageService>();
 builder.Services.AddSingleton<IQuandlWrapper, QuandlWrapper>();
 builder.Services.AddSingleton<IQuandlService, QuandlService>();
+builder.Services.AddSingleton<IIsdaWrapper, IsdaWrapper>();
+builder.Services.AddSingleton<IIsdaService, IsdaService>();
 
 // API Keys
 builder.Services.AddSingleton(
