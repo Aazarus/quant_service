@@ -48,10 +48,41 @@ public class YahooService : IYahooService
         var priceHistory =
             await _apiWrapper.GetSecurityPriceHistoryAsync(ticker, Instant.FromDateTimeUtc(start), frequency);
         if (priceHistory != null)
-            return GetStockDataFromSecurity(ticker, priceHistory, endDate);
+            return GetStockDataFromPriceTick(ticker, priceHistory, endDate);
 
         _logger.LogInformation($"Failed to get ticker: '{ticker}' with history");
         throw new Exception($"Failed to get ticker: '{ticker}' with history");
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<StockData> GetYahooStockEodData(string ticker, DateTime start, DateTime end)
+    {
+        var frequency = GetFrequencyFromPeriod("daily");
+        start = DateTime.SpecifyKind(start, DateTimeKind.Utc);
+        end = DateTime.SpecifyKind(end, DateTimeKind.Utc);
+        var endDate = end.ToLocalDateTime().Date;
+
+        var priceHistory = Task.Run(() =>
+            _apiWrapper.GetSecurityPriceHistoryAsync(ticker, Instant.FromDateTimeUtc(start), frequency)).Result;
+
+        var prices = new List<StockData>();
+
+        if (priceHistory == null) return prices;
+
+        prices.AddRange(priceHistory.TakeWhile(h => endDate >= h.Date)
+            .Select(h => new StockData
+            {
+                Ticker = ticker,
+                Date = h.Date.ToDateTimeUnspecified(),
+                Open = Convert.ToDecimal(h.Open),
+                High = Convert.ToDecimal(h.High),
+                Low = Convert.ToDecimal(h.Low),
+                Close = Convert.ToDecimal(h.Close),
+                CloseAdj = Convert.ToDecimal(h.AdjustedClose),
+                Volume = Convert.ToDecimal(h.Volume)
+            }));
+
+        return prices;
     }
 
     /// <summary>
@@ -76,7 +107,7 @@ public class YahooService : IYahooService
     /// <param name="priceHistory">The price history for the security.</param>
     /// <param name="endDate">The date of the final price to collect.</param>
     /// <returns>A collection of StockData objects.</returns>
-    private static IEnumerable<StockData> GetStockDataFromSecurity(string ticker, IEnumerable<PriceTick> priceHistory,
+    private static IEnumerable<StockData> GetStockDataFromPriceTick(string ticker, IEnumerable<PriceTick> priceHistory,
         LocalDate endDate)
     {
         return priceHistory.TakeWhile(h => endDate >= h.Date)

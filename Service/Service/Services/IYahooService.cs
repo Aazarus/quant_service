@@ -19,4 +19,13 @@ public interface IYahooService
     /// <exception cref="InvalidOperationException">Throws if fails to create YahooQuotes object.</exception>
     /// <exception cref="Exception">Throws if fails to find security with ticker.</exception>
     Task<IEnumerable<StockData>> GetStockDataWithPrices(string ticker, DateTime start, DateTime end, string period);
+
+    /// <summary>
+    ///     Returns a collection of historical EOD stock data from Yahoo finance.
+    /// </summary>
+    /// <param name="ticker">The ticker for the stock.</param>
+    /// <param name="start">The start date.</param>
+    /// <param name="end">The end date.</param>
+    /// <returns>Returns a collection of StockData.</returns>
+    IEnumerable<StockData> GetYahooStockEodData(string ticker, DateTime start, DateTime end);
 }
