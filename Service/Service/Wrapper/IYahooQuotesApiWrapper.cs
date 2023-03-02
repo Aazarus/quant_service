@@ -18,4 +18,13 @@ public interface IYahooQuotesApiWrapper
     /// <param name="frequency">The frequency for the price ticks.</param>
     /// <returns>A collection of PriceTicks.</returns>
     Task<IEnumerable<PriceTick>?> GetSecurityPriceHistoryAsync(string ticker, Instant start, Frequency frequency);
+
+    /// <summary>
+    ///     Returns a collection of historical EOD stock data from Yahoo finance.
+    /// </summary>
+    /// <param name="ticker">The ticker for the stock.</param>
+    /// <param name="start">The start date.</param>
+    /// <param name="frequency">The frequency for the price ticks.</param>
+    /// <returns>Returns a collection of PriceTicks.</returns>
+    Task<IEnumerable<PriceTick>?> GetYahooStockEodData(string ticker, Instant start, Frequency frequency);
 }

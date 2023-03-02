@@ -24,6 +24,15 @@ public class YahooQuotesApiWrapper : IYahooQuotesApiWrapper
         return yahooService?.PriceHistory.Value;
     }
 
+    /// <inheritdoc />
+    public async Task<IEnumerable<PriceTick>?> GetYahooStockEodData(string ticker, Instant start, Frequency frequency)
+    {
+        var yahooService = await CreateYahooQuotesWithStartAndFrequency(start, frequency)
+            .GetAsync(ticker, HistoryFlags.PriceHistory);
+
+        return yahooService?.PriceHistory.Value;
+    }
+
     /// <summary>
     ///     Creates a YahooQuotes object to collect Price history from the given start date and for the given frequency.
     /// </summary>
